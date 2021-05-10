@@ -74,6 +74,7 @@ def get_classes_idx(condition_name,condition_labels):
                 pass    
         #Get 1 random indx for each class
         indexes[class_name] = random.choice(class_labels_idxs)
+    return indexes
 
 #%%
 def get_MeasureUnit(sensor_name):
