@@ -128,7 +128,7 @@ def get_MeasureUnit(sensor_name):
 
 #%%
 def plt_RawSignals(RawData_dict,condition_name,condition_labels,
-                   fig_sz=(14,9),dpi=200,subplt=(3,6)):
+                   fig_sz=(14,9),dpi=200,subplt=(6,3)):
     """
     Plots the raw signal for each sensor
     
