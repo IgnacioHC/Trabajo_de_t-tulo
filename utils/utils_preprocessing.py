@@ -243,7 +243,8 @@ def plot_TimeParam(data_dict,condition_name,condition_labels,time_param,
         for class_name , class_TimeParam_data in classes_dict.items():
             stop = class_TimeParam_data.shape[0]
             x = np.linspace(1, stop,stop)
-            plt.scatter(x, class_TimeParam_data, label=class_name)
+            plt.scatter(x, class_TimeParam_data, label=class_name,
+                        alpha=0.25,linewidths=0.5)
         #FigText
         title1 = time_param + ' obtenido del sensor '+ sensor_name
         title2 = '\n Clasificasión: ' + condition_name 
