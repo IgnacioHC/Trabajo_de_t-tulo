@@ -37,4 +37,4 @@ for TimeParam in TimeParams_list:
         MinMaxScaler(copy=False).fit_transform(sensor_data.reshape(-1,1))
     #To DataFrame and save data
     file_name = 'data/data_TimeParams/data_' + TimeParam + '.csv'
-    pd.DataFrame.from_dict(datadict_TimeParam).to_csv(file_name)
+    pd.DataFrame.from_dict(datadict_TimeParam).to_csv(file_name,index=False)
