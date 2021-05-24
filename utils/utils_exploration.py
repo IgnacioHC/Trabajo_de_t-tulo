@@ -44,7 +44,6 @@ ConditionsLabels_dict = {
         #'Static conditions might not have been reached yet':1
     }    
 }
-
 #%% 
 def get_classes_idx(condition_name,condition_labels):
     """
@@ -75,7 +74,6 @@ def get_classes_idx(condition_name,condition_labels):
         #Get 1 random indx for each class
         indexes[class_name] = random.choice(class_labels_idxs)
     return indexes
-
 #%%
 def get_MeasureUnit(sensor_name):
     """
@@ -101,7 +99,6 @@ def get_MeasureUnit(sensor_name):
         measurement unit as str.
     
     """
-
     measurement_units_dict = {
           'Temperature sensor 1' : 'Temperature [°C]',
           'Temperature sensor 2' : 'Temperature [°C]',
@@ -121,11 +118,9 @@ def get_MeasureUnit(sensor_name):
           'Pressure sensor 6' : 'Pressure [bar]',
           'Motor power' : 'Power [W]'
           }
-
     for key in measurement_units_dict.keys():
         if key == sensor_name:
             return measurement_units_dict[sensor_name]
-
 #%%
 def plt_RawSignals(RawData_dict,condition_name,condition_labels,
                    fig_sz=(14,9),dpi=200,subplt=(6,3)):
@@ -152,34 +147,25 @@ def plt_RawSignals(RawData_dict,condition_name,condition_labels,
     plt.figure(figsize=fig_sz , dpi=dpi)  
     #Get random indxs for each class
     indexes = get_classes_idx(condition_name,condition_labels)
-    
     #Subplots
     for sensor_name in list(RawData_dict): 
-        sensor_data = RawData_dict[sensor_name]
-          
+        sensor_data = RawData_dict[sensor_name] 
         #Time vector
         len_TimeVector = sensor_data.shape[1]
         dt = 60/len_TimeVector
         t = np.linspace(0,dt*(len_TimeVector-1),len_TimeVector)
-        
         #Subplot position
         i = list(RawData_dict).index(sensor_name) + 1
         m,n = subplt
         plt.subplot(m,n,i)
-        
         #Iter over classes        
         for class_name , class_idx in indexes.items():
             plt.plot(t,sensor_data[class_idx,:],label=class_name)
-             
         #FigText
         title = 'Raw signal ' + condition_name + '\n{}'.format(sensor_name)
         plt.title(title,size=12)
         plt.xlabel('Time [seconds]',size=11)
         plt.ylabel(get_MeasureUnit(sensor_name),size=11)
-        
-        plt.legend()  
-        
+        plt.legend()      
     plt.tight_layout()
     plt.show()
-
-

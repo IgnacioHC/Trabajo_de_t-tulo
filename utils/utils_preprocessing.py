@@ -52,13 +52,12 @@ def to_TimeParam(Xt,time_param,t_win=20,overlap_ratio=0):
         #Calculate the time param
         if time_param == 'RMS':
             array_TimeParam[i] = sqrt(mean(square(Xt[start:stop])))
-            
+        if time_param == 'P2P':
+            array_TimeParam[i] = np.amax(Xt[start:stop])-np.amin(Xt[start:stop])    
         if time_param == 'Variance':
-            array_TimeParam[i] = np.var(Xt[start:stop])        
-        
+            array_TimeParam[i] = np.var(Xt[start:stop])      
         else: #time_param == 'Mean':
             array_TimeParam[i] = mean(Xt[start:stop])    
-    
     return array_TimeParam
 
 #%% ConditionsLabels_dict
@@ -99,8 +98,7 @@ ConditionsLabels_dict = {
 }
 
 #%%
-def get_TimeParam_dict(RawData_dict,condition_labels,condition_name,
-                       time_param,t_win=20,overlap_ratio=0):
+def get_TimeParam_dict(RawData_dict,time_param,t_win=20,overlap_ratio=0):
     """
     Calculates one of the time params over the time windows of each instance
     from the given sensor's raw data   
@@ -111,14 +109,7 @@ def get_TimeParam_dict(RawData_dict,condition_labels,condition_name,
     
     RawData_dict: dict
          Dict with the raw data from the sensors, in the form
-         {sensor_name : data_raw}.
-         
-    condition_labels: np.array with shape (2205,)
-        Array that contains the class label for each instance
-        
-    condition_name: {'Cooler condition','Valve condition','Pump leakage',
-                     'Accumulator condition','Stable flag'}
-        Name of hydraulic system's condition to be clasified      
+         {sensor_name : data_raw}.  
         
     time_param:  {'RMS','Variance','Mean'}  
         Name of the time parameter to be calculated 
@@ -226,7 +217,6 @@ def plot_TimeParam(data_dict,condition_name,condition_labels,time_param,
     out: plots 
       
     """
-
     #Figure settings
     plt.figure(figsize=fig_sz , dpi=200)
     #Iterate over sensors
@@ -238,8 +228,7 @@ def plot_TimeParam(data_dict,condition_name,condition_labels,time_param,
         #Iterate over condition classes
         classes_dict = split_classes(sensor_data = data_dict[sensor_name],
                                      condition_name = condition_name,
-                                     condition_labels = condition_labels)
-        
+                                     condition_labels = condition_labels)      
         for class_name , class_TimeParam_data in classes_dict.items():
             stop = class_TimeParam_data.shape[0]
             x = np.linspace(1, stop,stop)
@@ -323,7 +312,7 @@ def get_Y(data_dict,condition_labels):
         #Create the new labels from 0 to 2205*win_per_instance-1
         new_labels = np.array([label]*win_per_instance)
         Y_new = np.concatenate((Y_new,new_labels),axis=0)
-    return Y_new #new 
+    return Y_new
 
 #%%
 def preprocess_data(RawData_dict,condition_labels,condition_name,time_param):
@@ -353,26 +342,19 @@ def preprocess_data(RawData_dict,condition_labels,condition_name,time_param):
     """
     #Get time param       
     TimeParam_dict = get_TimeParam_dict(RawData_dict=RawData_dict,
-                                        condition_labels=condition_labels,
-                                        condition_name=condition_name,
                                         time_param=time_param)
     #Scale data
     for sensor_name , sensor_data in TimeParam_dict.items():
-      MinMaxScaler().fit_transform(sensor_data.reshape(-1,1))    
-    
+      MinMaxScaler(copy=False).fit_transform(sensor_data.reshape(-1,1))    
     #Get X and Y
     X = get_X(TimeParam_dict)
     Y = get_Y(TimeParam_dict,condition_labels=condition_labels)
-    
     #Split data
     X_train,X_test,Y_train,Y_test = train_test_split(X,Y,
                                                      train_size = 0.7,
                                                      random_state = 19)
-    
     return X_train,X_test,Y_train,Y_test
-
 #%% 
-
 def plt_multiCM(models_dict,X_test,Y_test,condition_name,cmap='Blues'):
     """
      Plotea las matrices de confusion con los resultados de los modelos
@@ -398,8 +380,7 @@ def plt_multiCM(models_dict,X_test,Y_test,condition_name,cmap='Blues'):
     
     """    
     classes_names=list(ConditionsLabels_dict[condition_name].keys())
-    fig, axes = plt.subplots(nrows=2, ncols=2, figsize=(15,10))
-    
+    fig, axes = plt.subplots(nrows=2, ncols=2, figsize=(15,10))   
     for model_name, ax in zip(list(models_dict) , axes.flatten()):
         plot_confusion_matrix(models_dict[model_name], 
                               X_test, 
@@ -409,7 +390,6 @@ def plt_multiCM(models_dict,X_test,Y_test,condition_name,cmap='Blues'):
                               display_labels=classes_names)
         acc = accuracy_score(Y_test,models_dict[model_name].predict(X_test))
         title = model_name + ', accuracy: {:1.3f}'.format(acc)
-        ax.title.set_text(title)
-    
+        ax.title.set_text(title)   
     plt.tight_layout()  
-    plt.show()    
+    plt.show()
