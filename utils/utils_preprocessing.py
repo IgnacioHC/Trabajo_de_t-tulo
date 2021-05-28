@@ -189,7 +189,6 @@ def plot_TimeParam(data_dict,condition_name,condition_labels,time_param,
     subplots in 1 figure. Every curve in each subplot represents a different
     class.
 
-
     Parameters
     --------------------------------------------------------------------------
     
@@ -209,8 +208,7 @@ def plot_TimeParam(data_dict,condition_name,condition_labels,time_param,
         n=rows , m=cols
         
     fig_sz (float,float) tuple, default=(14,10)
-        Size of the figure that contains the plots
-        
+        Size of the figure that contains the plots        
         
     Returns
     --------------------------------------------------------------------------

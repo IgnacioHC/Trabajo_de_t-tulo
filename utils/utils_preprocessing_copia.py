@@ -96,10 +96,11 @@ ConditionsLabels_dict = {
     }    
 }
 #%%
-def get_TimeParam_df(RawData_dict,time_param,t_win=20,overlap_ratio=0):
+def get_TimeParam_dict(RawData_dict,time_param,t_win=20,overlap_ratio=0):
     """
     Calculates one of the time params over the time windows of each instance
-    from the given sensor's raw data.   
+    from the given sensor's raw data   
+    
     
     Parameters
     --------------------------------------------------------------------------
@@ -108,7 +109,7 @@ def get_TimeParam_df(RawData_dict,time_param,t_win=20,overlap_ratio=0):
          Dict with the raw data from the sensors, in the form
          {sensor_name : data_raw}.  
         
-    time_param:  {'RMS','P2P','Variance','Mean'}  
+    time_param:  {'RMS','Variance','Mean'}  
         Name of the time parameter to be calculated 
     
     t_win: int (t_win<60) , default=20
@@ -119,8 +120,8 @@ def get_TimeParam_df(RawData_dict,time_param,t_win=20,overlap_ratio=0):
     
     Returns
     --------------------------------------------------------------------------
-    out: DataFrame with the time parameter of every sensor as columns. The df
-    have a length of (win_per_instance*2205).
+    out: dict in the form {sensor_name : array_concat}. array_concat is the
+    array that contains the time params with shape (win_per_instance*2205,).
     
     """
     TimeParam_dict = {}
@@ -133,7 +134,7 @@ def get_TimeParam_df(RawData_dict,time_param,t_win=20,overlap_ratio=0):
                                            overlap_ratio=overlap_ratio)            
             array_concat = np.concatenate((array_concat,array_TimeParam),axis=0)
         TimeParam_dict[sensor_name] = array_concat
-    return pd.DataFrame.from_dict(TimeParam_dict)
+    return TimeParam_dict
 #%%
 def split_classes(sensor_data,condition_name,condition_labels):   
     """
@@ -173,7 +174,7 @@ def split_classes(sensor_data,condition_name,condition_labels):
         splited_classes[class_name] = sensor_data[class_newindxs.astype(int)]
     return splited_classes
 #%%
-def plot_TimeParam(TimeParam_df,condition_name,condition_labels,time_param
+def plot_TimeParam(TimeParam_dict,condition_name,condition_labels,time_param
                    ,fig_sz=(20,18)):   
     """
     Plots the selected time parameter for each sensor data in data_dict as
@@ -207,20 +208,22 @@ def plot_TimeParam(TimeParam_df,condition_name,condition_labels,time_param
     out: plots 
       
     """
-    #Figure settings 
+    #Figure settings
     plt.figure(figsize=fig_sz , dpi=200)
-    #Iterate over DataFrame sensors
-    for i in range(len(TimeParam_df)):
+    #Iterate over sensors
+    for sensor_name in list(TimeParam_dict):
         #Subplot position
-        plt.subplot(np.ceil(len(TimeParam_df)/3).astype(int), 3, i+1)
-        classes_dict = split_classes(sensor_data = TimeParam_df.values[i],
-                                      condition_name = condition_name,
-                                      condition_labels = condition_labels)          
+        i = list(TimeParam_dict).index(sensor_name) + 1
+        plt.subplot(np.ceil(len(list(TimeParam_dict))/3).astype(int), 3,i)
+        #Iterate over condition classes
+        classes_dict = split_classes(sensor_data = TimeParam_dict[sensor_name],
+                                     condition_name = condition_name,
+                                     condition_labels = condition_labels)      
         for class_name , class_TimeParam_data in classes_dict.items():
             stop = class_TimeParam_data.shape[0]
             x = np.linspace(1, stop,stop)
             plt.scatter(x, class_TimeParam_data, label=class_name)
-        #FigText
+       #FigText
         title1 = time_param + ' obtenido del sensor '#+ TimeParam_df.columns[i]
         title2 = '\n Clasificasión: ' + condition_name 
         title = title1 + title2
@@ -255,5 +258,47 @@ def get_Y(TimeParam_df,condition_labels):
         new_labels = np.array([label]*win_per_instance)
         Y_new = np.concatenate((Y_new,new_labels),axis=0)
     return Y_new
+#%%
+def preprocess_data(RawData_dict,condition_labels,condition_name,time_param,
+                    train_sz = 0.7,random_st=19):
+    """
+     Utiliza las funciones anteriormente definidas para realizar el
+     preprocesamiento de los datos. Retorna los conjuntos X e Y
 
+    Parameters
+    --------------------------------------------------------------------------
+    
+    RawData_dict: dict
+        Contains time param data for every sensor as
+        {'sensor_name' : sensor_TimeParam}.
+       
+    condition_labels: np.array with shape (2205,)
+        Array that contains the class label for each instance
+        
+    condition_name: {'Cooler condition','Valve condition','Pump leakage',
+                     'Accumulator condition','Stable flag'}
+        Name of hydraulic system's condition to be clasified   
+        
+    Returns
+    --------------------------------------------------------------------------
+    out: np.arrays
+    Returns the X_train,X_test,Y_train,Y_test sets
+
+    """
+    #Get time param       
+    TimeParam_dict = get_TimeParam_dict(RawData_dict=RawData_dict,
+                                        time_param=time_param)
+    #Scale data
+    for sensor_name , sensor_data in TimeParam_dict.items():
+      MinMaxScaler(copy=False).fit_transform(sensor_data.reshape(-1,1))
+    #Get TimeParam_df
+    TimeParam_df = pd.DataFrame.from_dict(TimeParam_dict)
+    #Get X and Y
+    X = TimeParam_df.values
+    Y = get_Y(TimeParam_df, condition_labels=condition_labels)
+    #Split data
+    X_train,X_test,Y_train,Y_test = train_test_split(X,Y,
+                                                     train_size = train_sz,
+                                                     random_state = random_st)
+    return X_train,X_test,Y_train,Y_test
 #%%
