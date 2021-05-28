@@ -122,6 +122,53 @@ def get_MeasureUnit(sensor_name):
         if key == sensor_name:
             return measurement_units_dict[sensor_name]
 #%%
+def get_MeasureUnit_ES(sensor_name):
+    """
+    Returns a str with the sensor's measurement unit.
+    
+    --------------------------------------------------------------------------
+    Parameters
+    
+    sensor_name: {'Temperature sensor 1','Temperature sensor 2',
+                  'Temperature sensor 3','Temperature sensor 4',
+                  'Vibration sensor','Cooling efficiency','Cooling power',
+                  'Efficiency factor','Flow sensor 1','Flow sensor 2',
+                  'Pressure sensor 1','Pressure sensor 2','Pressure sensor 3',
+                  'Pressure sensor 4','Pressure sensor 5','Pressure sensor 6',
+                  'Motor power'}
+        sensor's name as str to be matched to their corresponding
+        measurement unit.
+    
+    --------------------------------------------------------------------------
+    Returns
+    
+    out: str
+        measurement unit as str.
+    
+    """
+    measurement_units_dict = {
+          'Temperature sensor 1' : 'Temperatura [°C]',
+          'Temperature sensor 2' : 'Temperatura [°C]',
+          'Temperature sensor 3' : 'Temperatura [°C]',
+          'Temperature sensor 4' : 'Temperatura [°C]',
+          'Vibration sensor' : 'Velocidad [mm/s]',
+          'Cooling efficiency' : 'Eficiencia [%]',
+          'Cooling power' : 'Potencia [kW]',
+          'Efficiency factor' : 'Eficiencia [%]',
+          'Flow sensor 1' : 'Flujo de agua [L/min]',
+          'Flow sensor 2' : 'Flujo de agua [L/min]',
+          'Pressure sensor 1' : 'Presión [bar]',
+          'Pressure sensor 2' : 'Presión [bar]',
+          'Pressure sensor 3' : 'Presión [bar]',
+          'Pressure sensor 4' : 'Presión [bar]',
+          'Pressure sensor 5' : 'Presión [bar]',
+          'Pressure sensor 6' : 'Presión [bar]',
+          'Motor power' : 'Potencia [W]'
+          }
+    for key in measurement_units_dict.keys():
+        if key == sensor_name:
+            return measurement_units_dict[sensor_name]
+#%%
 def plt_RawSignals(RawData_dict,condition_name,condition_labels,
                    fig_sz=(14,9),dpi=200,subplt=(6,3)):
     """

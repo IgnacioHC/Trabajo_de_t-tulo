@@ -1,13 +1,18 @@
+# -*- coding: utf-8 -*-
 """
-@author: Ignacio
+Created on Thu May 27 17:16:28 2021
+
+@author: ihuer
 """
-#%% Imports
 import numpy as np
 import pandas as pd
-from sklearn.preprocessing import MinMaxScaler
-from utils.utils_preprocessing import get_TimeParam_dict
-#%% Load raw data
-folder = 'data/data_raw/'
+from utils.utils_preprocessing_copia import get_TimeParam_df
+
+#from utils.utils_preprocessing_copia import plot_TimeParam
+#%% Load data
+#raw data path
+folder = "data/data_raw/"
+
 dataRaw_dict = {
     'Temperature sensor 1' : np.loadtxt(folder + "TS1.txt"),
     'Temperature sensor 2' : np.loadtxt(folder + "TS2.txt"),
@@ -27,14 +32,7 @@ dataRaw_dict = {
     'Pressure sensor 6' : np.loadtxt(folder + "PS6.txt"),
     'Motor power' : np.loadtxt(folder + "EPS1.txt")
 }
-#%% Preprocess data
-TimeParams_list = ['RMS','Variance','P2P','Mean']
-for TimeParam in TimeParams_list:
-    #Get time param
-    datadict_TimeParam = get_TimeParam_dict(dataRaw_dict,TimeParam)
-    #Scale data
-    for sensor_name , sensor_data in datadict_TimeParam.items():
-        MinMaxScaler(copy=False).fit_transform(sensor_data.reshape(-1,1))
-    #To DataFrame and save data
-    file_name = 'data/data_TimeParams/data_' + TimeParam + '.csv'
-    pd.DataFrame.from_dict(datadict_TimeParam).to_csv(file_name,index=False)
+#%%
+TimeParam_df = get_TimeParam_df(dataRaw_dict,'RMS')
+#%%
+sensor_name = TimeParam_df.columns[0]

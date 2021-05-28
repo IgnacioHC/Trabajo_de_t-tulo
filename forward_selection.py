@@ -22,7 +22,7 @@ dataRaw_dict = {
     'Cooling power' : np.loadtxt(folder + "CP.txt"),
     'Efficiency factor' : np.loadtxt(folder + "SE.txt"),
     'Flow sensor 1' : np.loadtxt(folder + "FS1.txt"),
-    'Flow sensor 2' : np.loadtxt(folder + "FS2.txt"),
+    'Flow sensor 2' : np.loadtxt(folder + "FS2.txt"), #10
     'Pressure sensor 1' : np.loadtxt(folder + "PS1.txt"),
     'Pressure sensor 2' : np.loadtxt(folder + "PS2.txt"),
     'Pressure sensor 3' : np.loadtxt(folder + "PS3.txt"),
@@ -44,17 +44,13 @@ for TimeParam in TimeParams_list:
     pd.DataFrame.from_dict(datadict_TimeParam).to_csv(file_name,index=False)
 
 #%%
-get_comblist = lambda i:[list(comb) for comb in combinations(np.linspace(1,17,17).astype(int).tolist(),i)]
+good_sensors = [1,2,3,4,6,7,10,15,16] #good sensors
+get_comblist = lambda i:[list(comb) + good_sensors for comb in combinations([5,8,9,11,12,13,14,17],i)]
 combinations_list = []
-#%%
-for i in range(1,18):
-  combinations_list = combinations_list + get_comblist(i)
+for i in range(1,9):
+    combinations_list = combinations_list + get_comblist(i)
 #%% save list
 pickle.dump(combinations_list, open("data/combinations_list.txt", "wb"))
-#%% Load  data
-df_RMS = pd.read_csv('data/data_TimeParams/data_RMS.csv')
-combinations_list = pickle.load(open("data/combinations_list.txt", "rb"))
-cooler_labels = np.loadtxt('data/labels/labels_cooler.txt')
 #%%
 def get_Y_df(TimeParam_df,condition_labels):
     #Calculate the number of windows per instance
