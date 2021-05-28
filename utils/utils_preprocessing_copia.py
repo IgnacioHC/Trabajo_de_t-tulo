@@ -221,7 +221,7 @@ def plot_TimeParam(TimeParam_df,condition_name,condition_labels,time_param
             x = np.linspace(1, stop,stop)
             plt.scatter(x, class_TimeParam_data, label=class_name)
         #FigText
-        title1 = time_param + ' obtenido del sensor '+ TimeParam_df.columns[i]
+        title1 = time_param + ' obtenido del sensor '#+ TimeParam_df.columns[i]
         title2 = '\n Clasificasión: ' + condition_name 
         title = title1 + title2
         plt.title(title,size=10)
