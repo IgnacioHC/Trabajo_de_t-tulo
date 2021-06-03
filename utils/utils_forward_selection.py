@@ -6,7 +6,7 @@ Created on Fri May 28 17:06:04 2021
 """
 #%% Imports
 import numpy as np
-from utils.utils_preprocessing import get_Y
+from utils_preprocessing import get_Y
 from sklearn.metrics import accuracy_score
 from sklearn.model_selection import train_test_split
 #%% Sensor names list
