@@ -120,38 +120,40 @@ def get_BestCombination(TimeParam_df, combinations_list, model,
         Model.fit(X_train, Y_train)
         acc_list.append(accuracy_score(Y_test,Model.predict(X_test)))    
     max_acc = np.max(np.array(acc_list))
-    max_idxs = [sensors_idx_list[i] for i in get_max_idxs(acc_list,max_acc)]
-    return max_idxs , max_acc
+    #max_idxs = [sensors_idx_list[i] for i in get_max_idxs(acc_list,max_acc)]
+    return max_acc
 #%%
-def forward_selection(TimeParam_df,model,condition_labels):
-    """
-    .
-    --------------------------------------------------------------------------
-    Parameters      
+# def forward_selection(TimeParam_df, model, condition_labels,
+#                       show_scores = False):
+#     """
+#     .
+#     --------------------------------------------------------------------------
+#     Parameters      
     
-    TimeParam_df: DataFrame
-        DataFrame that contains the time param data
+#     TimeParam_df: DataFrame
+#         DataFrame that contains the time param data
     
-    model:
-        Model to make the calsification
+#     model:
+#         Model to make the calsification
 
-    condition_labels: np.array with shape (2205,)
-        Array that contains the class label for each instance     
-    --------------------------------------------------------------------------
-    Returns
-    out: 
-    """
-    good_idxs = []
-    old_max_acc = 0
-    max_acc = 0
-    while  max_acc >= old_max_acc:
-        old_max_acc = max_acc
-        combs_list = get_combinations(good_idxs)
-        max_idxs , max_acc = get_BestCombination(TimeParam_df=TimeParam_df,
-                                                 combinations_list=combs_list,
-                                                 model=model,
-                                                 condition_labels=condition_labels)
-        sensors_idx_list.remove(max_idxs[0])
-        good_idxs.append(max_idxs[0])
-    print('Max accuracy: ',max_acc)
-    print('Mejores sensores: ',sorted(good_idxs))
+#     condition_labels: np.array with shape (2205,)
+#         Array that contains the class label for each instance     
+#     --------------------------------------------------------------------------
+#     Returns
+#     out: 
+#     """
+#     good_idxs = []
+#     old_max_acc = 0
+#     max_acc = 0
+#     while  max_acc >= old_max_acc:
+#         old_max_acc = max_acc
+#         combs_list = get_combinations(good_idxs)
+#         max_idxs , max_acc = get_BestCombination(TimeParam_df=TimeParam_df,
+#                                                  combinations_list=combs_list,
+#                                                  model=model,
+#                                                  condition_labels=condition_labels)
+#         sensors_idx_list.remove(max_idxs[0])
+#         good_idxs.append(max_idxs[0])
+#     if show_scores == True:
+#         print('Max accuracy: ',max_acc)
+#         print('Mejores sensores: ',sorted(good_idxs))
