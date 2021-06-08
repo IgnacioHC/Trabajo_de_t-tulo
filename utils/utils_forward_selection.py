@@ -116,12 +116,11 @@ def get_BestCombination(TimeParam_df, combinations_list, model,
         Model = model
         sensor_list = [all_sensors[i] for i in sensors_combination]
         X_train,X_test,Y_train,Y_test = get_XY_TrainTest(TimeParam_df[sensor_list],
-                                                         condition_labels=condition_labels)
+                                                          condition_labels=condition_labels)
         Model.fit(X_train, Y_train)
         acc_list.append(accuracy_score(Y_test,Model.predict(X_test)))    
     max_acc = np.max(np.array(acc_list))
-    #max_idxs = [sensors_idx_list[i] for i in get_max_idxs(acc_list,max_acc)]
-    return max_acc
+    return max_acc , get_max_idxs(acc_list, max_acc)
 #%%
 # def forward_selection(TimeParam_df, model, condition_labels,
 #                       show_scores = False):

@@ -7,6 +7,7 @@ Created on Wed Jun  2 17:11:30 2021
 #%% Imports
 import pandas as pd
 import numpy as np
+import csv
 from utils.utils_preprocessing import get_Y
 
 from sklearn.metrics import accuracy_score
@@ -14,21 +15,24 @@ from sklearn.model_selection import train_test_split
 
 from sklearn.ensemble import RandomForestClassifier
 from sklearn.neighbors import KNeighborsClassifier
+from sklearn.discriminant_analysis import LinearDiscriminantAnalysis
 #%% Load data
 folder = 'data/data_TimeParams/'
 TimeParams = {
     'RMS' : pd.read_csv(folder + 'data_RMS.csv'),
-    'Peak2Peak' : pd.read_csv(folder + 'data_P2P.csv'),
+    'P2P' : pd.read_csv(folder + 'data_P2P.csv'),
     'Variance' : pd.read_csv(folder + 'data_Variance.csv'),
     'Mean' : pd.read_csv(folder + 'data_Mean.csv')
     }
 #%% Load labels
 labels_folder = 'data/labels/'
-cooler_labels = np.loadtxt(labels_folder + 'labels_cooler.txt')
-valve_labels = np.loadtxt(labels_folder + 'labels_valve.txt')
-pump_labels = np.loadtxt(labels_folder + 'labels_pump.txt')
-accumulator_labels = np.loadtxt(labels_folder + 'labels_accumulator.txt')
-stableFlag_labels = np.loadtxt(labels_folder + 'labels_stableFlag.txt')
+labels_dict = {
+    'cooler':np.loadtxt(labels_folder + 'labels_cooler.txt'),
+    'valve':np.loadtxt(labels_folder + 'labels_valve.txt'),
+    'pump':np.loadtxt(labels_folder + 'labels_pump.txt'),
+    'accumulator': np.loadtxt(labels_folder + 'labels_accumulator.txt'),
+    'stableFlag':np.loadtxt(labels_folder + 'labels_stableFlag.txt')    
+    }
 #%% Sensor names list
 all_sensors = ['Temperature sensor 1', #0
                 'Temperature sensor 2', #1
@@ -114,4 +118,52 @@ def forward_selection(TimeParam_df, model, condition_labels,
     if show_scores == True:
         print('Max accuracy: ',max_acc)
         print('Mejores sensores: ',sorted(good_idxs))
-    return old_max_acc, good_idxs
+    return old_max_acc
+
+#%%
+# for condition in ['cooler','valve','pump','accumulator','stableFlag']:
+#     path = 'data/accuracies/' + condition  + '_accuracies.csv'
+#     Dict = {'Time param':['RMS', 'P2P', 'Variance', 'Mean' ],
+#             'KNN 6':np.zeros(4),
+#             'KNN 5':np.zeros(4),
+#             'KNN 4':np.zeros(4),
+#             'KNN 3':np.zeros(4),
+#             'RF 100':np.zeros(4),
+#             'RF 80':np.zeros(4),
+#             'RF 60':np.zeros(4),
+#             'RF 50':np.zeros(4),}
+#     #index = ['RMS', 'P2P', 'Variance', 'Mean' ]
+#     df = pd.DataFrame(Dict,index=index)
+#     df.to_csv(path, index=False)
+#%%
+TimeParam_name = 'RMS'
+model = RandomForestClassifier(n_estimators=100)
+#model = KNeighborsClassifier(n_neighbors=4)
+#model = LinearDiscriminantAnalysis(n_components=2) #n_components < n_classes - 1
+labels = 'cooler'
+
+
+max_acc = forward_selection(TimeParams[TimeParam_name], model,
+                            labels_dict[labels])
+#%% Save max acc
+
+df_idxs = {
+    'RMS':0,
+    'P2P':1,
+    'Variance':2,
+    'Mean':3
+    }
+
+
+TimeParam_idx = df_idxs[TimeParam_name]
+model_name = 'RF 100' 
+
+path = 'data/accuracies/' + labels  + '_accuracies.csv'
+df = pd.read_csv(path)
+df.at[TimeParam_idx, model_name] = max_acc.round(decimals=5)
+df.to_csv(path, index=False)
+#%%
+# path = 'data/accuracies/' + labels  + '_accuracies.csv'
+# df = pd.read_csv(path)
+# df.drop(['RF 10'],axis=1,inplace=True)
+# df.to_csv(path, index=False)
