@@ -1,7 +1,5 @@
 # -*- coding: utf-8 -*-
 """
-Created on Mon May  3 10:11:03 2021
-
 @author: Ignacio
 """
 #%% IMPORTS
@@ -10,15 +8,13 @@ from numpy import mean, sqrt, square
 import pandas as pd
 import matplotlib.pyplot as plt
 
-from sklearn.metrics import accuracy_score,plot_confusion_matrix
 from sklearn.preprocessing import MinMaxScaler
 from sklearn.model_selection import train_test_split
 #%%
-def to_TimeParam(Xt,time_param,t_win=20,overlap_ratio=0):
+def to_TimeParam(Xt, time_param, t_win = 20, t_olap = 0):
     """
     Calculates one of the time params (RMS , Variance, Mean) over time
     windows from sensor's instance data.   
-    
     
     Parameters
     --------------------------------------------------------------------------
@@ -29,11 +25,11 @@ def to_TimeParam(Xt,time_param,t_win=20,overlap_ratio=0):
     time_param:  {'RMS','Variance','Mean'}  
         Name of the time parameter to be calculated 
     
-    t_win: int (t_win<60) ,default=20
+    t_win: int (t_win<60), default=20
         Window time length in seconds     
     
-    overlap_ratio: float , default=0
-        Ratio overlap/len_window
+    t_olap: float, default=0
+        Overlap time length in seconds
     
     Returns
     --------------------------------------------------------------------------
@@ -41,14 +37,12 @@ def to_TimeParam(Xt,time_param,t_win=20,overlap_ratio=0):
     
     """
     len_window = t_win/60 * Xt.shape[0] 
-    overlap = len_window * overlap_ratio 
+    overlap = t_olap/60 * Xt.shape[0]  
     win_per_instance= int(np.floor((Xt.shape[0]-overlap)/(len_window-overlap)))
-        
     array_TimeParam = np.zeros((win_per_instance,))
     for i in range(win_per_instance):
         start = int(i*(len_window - overlap))
         stop = int(start + len_window)
-        
         #Calculate the time param
         if time_param == 'RMS':
             array_TimeParam[i] = sqrt(mean(square(Xt[start:stop])))
@@ -96,11 +90,11 @@ ConditionsLabels_dict = {
     }    
 }
 #%%
-def get_TimeParam_dict(RawData_dict,time_param,t_win=20,overlap_ratio=0):
+def get_TimeParam_dict(RawData_dict, time_param, t_win = 20,
+                       t_olap = 0):
     """
     Calculates one of the time params over the time windows of each instance
     from the given sensor's raw data   
-    
     
     Parameters
     --------------------------------------------------------------------------
@@ -115,23 +109,20 @@ def get_TimeParam_dict(RawData_dict,time_param,t_win=20,overlap_ratio=0):
     t_win: int (t_win<60) , default=20
         Window time length in seconds     
     
-    overlap_ratio: float , default=0
-        Ratio overlap/len_window
+    t_olap: float , default=0
+        Overlap time length in seconds
     
     Returns
     --------------------------------------------------------------------------
     out: dict in the form {sensor_name : array_concat}. array_concat is the
-    array that contains the time params with shape (win_per_instance*2205,).
-    
+    array that contains the time params with shape (win_per_instance*2205,).  
     """
     TimeParam_dict = {}
     for sensor_name , sensor_data in RawData_dict.items():        
-        array_concat = np.array([])
-        for instance_idx in range(2205):
+        array_concat = np.array([])     
+        for instance_idx in range(sensor_data.shape[0]):
             array_TimeParam = to_TimeParam(sensor_data[instance_idx,:],
-                                           time_param = time_param,
-                                           t_win = t_win,
-                                           overlap_ratio=overlap_ratio)            
+                                           time_param, t_win, t_olap)            
             array_concat = np.concatenate((array_concat,array_TimeParam),axis=0)
         TimeParam_dict[sensor_name] = array_concat
     return TimeParam_dict
@@ -273,7 +264,18 @@ def plot_TimeParamES(TimeParam_dict,condition_name,condition_labels,time_param,
     plt.tight_layout()
     plt.show()
 #%%
-def get_Y(TimeParam_df,condition_labels):
+def split_data(dataRaw_dict, condition_labels, train_sz=0.7, random_st=19):
+    RawData_dict_train, RawData_dict_test = {}, {} 
+    for sensor_name, sensor_RawData in dataRaw_dict.items():
+        sensor_sets = train_test_split(sensor_RawData, condition_labels,
+                                       train_size = train_sz,
+                                       random_state = random_st)
+        RawData_sensor_train, RawData_sensor_test, Y_train, Y_test = sensor_sets
+        RawData_dict_train[sensor_name] = RawData_sensor_train
+        RawData_dict_test[sensor_name] = RawData_sensor_test
+    return RawData_dict_train, RawData_dict_test, Y_train, Y_test
+#%%
+def get_Y(condition_labels, t_win = 20, t_olap = 0):
     """
      Toma el array con las etiquetas correspondientes a la clasificasión 
      (condición de salud) con shape (2205,5) y retorna las etiquetas con shape
@@ -288,7 +290,7 @@ def get_Y(TimeParam_df,condition_labels):
 
     """      
     #Calculate the number of windows per instance
-    win_per_instance = int(len(TimeParam_df)/2205)
+    win_per_instance= int(np.floor((60-t_olap)/(t_win-t_olap)))
     Y_new = np.array([])
     #Iterate over the condition labels
     for label in condition_labels:
@@ -297,8 +299,8 @@ def get_Y(TimeParam_df,condition_labels):
         Y_new = np.concatenate((Y_new,new_labels),axis=0)
     return Y_new
 #%%
-def preprocess_data(RawData_dict,condition_labels,condition_name,time_param,
-                    train_sz = 0.7,random_st=19):
+def preprocess_data(RawData_dict, condition_labels, time_param, t_win, t_olap,
+                    train_sz = 0.7, random_st=19):
     """
      Utiliza las funciones anteriormente definidas para realizar el
      preprocesamiento de los datos. Retorna los conjuntos X e Y
@@ -313,9 +315,6 @@ def preprocess_data(RawData_dict,condition_labels,condition_name,time_param,
     condition_labels: np.array with shape (2205,)
         Array that contains the class label for each instance
         
-    condition_name: {'Cooler condition','Valve condition','Pump leakage',
-                     'Accumulator condition','Stable flag'}
-        Name of hydraulic system's condition to be clasified   
         
     Returns
     --------------------------------------------------------------------------
@@ -323,20 +322,27 @@ def preprocess_data(RawData_dict,condition_labels,condition_name,time_param,
     Returns the X_train,X_test,Y_train,Y_test sets
 
     """
-    #Get time param       
-    TimeParam_dict = get_TimeParam_dict(RawData_dict=RawData_dict,
-                                        time_param=time_param)
+    # Split data
+    sets = split_data(RawData_dict, condition_labels, train_sz, random_st)
+    RawData_dict_train, RawData_dict_test, Y_train, Y_test = sets
+    #Get time param dicts
+    TimeParam_dict_train = get_TimeParam_dict(RawData_dict_train, time_param,
+                                              t_win, t_olap)
+    TimeParam_dict_test = get_TimeParam_dict(RawData_dict_test, time_param,
+                                             t_win, t_olap)
     #Scale data
-    for sensor_name , sensor_data in TimeParam_dict.items():
-      MinMaxScaler(copy=False).fit_transform(sensor_data.reshape(-1,1))
-    #Get TimeParam_df
-    TimeParam_df = pd.DataFrame.from_dict(TimeParam_dict)
-    #Get X and Y
-    X = TimeParam_df.values
-    Y = get_Y(TimeParam_df, condition_labels=condition_labels)
-    #Split data
-    X_train,X_test,Y_train,Y_test = train_test_split(X,Y,
-                                                     train_size = train_sz,
-                                                     random_state = random_st)
-    return X_train,X_test,Y_train,Y_test
-#%%
+    for sensor_name , sensor_train_data in TimeParam_dict_train.items():
+        sensor_test_data = TimeParam_dict_test[sensor_name]
+        concat_array = np.concatenate([sensor_train_data, sensor_test_data], axis=0)
+        scaler_fit = MinMaxScaler(copy=False).fit(concat_array.reshape(-1,1))
+        scaler_fit.transform(sensor_train_data.reshape(-1,1))
+        scaler_fit.transform(TimeParam_dict_test[sensor_name].reshape(-1,1))
+    #Get time param DataFrames
+    TimeParam_df_train =  pd.DataFrame.from_dict(TimeParam_dict_train)
+    TimeParam_df_test =  pd.DataFrame.from_dict(TimeParam_dict_test)
+    #Get sets
+    # X_train = TimeParam_df_train.values
+    # X_test = TimeParam_df_test.values
+    Y_train = get_Y(Y_train, t_win, t_olap)
+    Y_test = get_Y(Y_test, t_win, t_olap)
+    return TimeParam_df_train, TimeParam_df_test, Y_train, Y_test
