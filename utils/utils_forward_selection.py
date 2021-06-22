@@ -449,7 +449,7 @@ def get_TimeParams_df_dict(TimeParams_list, RawData_dict, condition_labels,
 def conditions_fwd_select(RawData_dict, conditions_dict, models_dict,
                           TimeParams_list, win_olap_str, train_sz = 0.7,
                           random_st = 19, save = True):
-    print('====================',str(win_olap_str),'=====================')
+    print('=====',str(win_olap_str),'=====')
     conditions_accuracies = {}
     condition_idxs = {}
     conditions_times = {}

@@ -64,9 +64,9 @@ RF_models = {
     }
 
 LDA_models = {
-    'LDA 1' : LinearDiscriminantAnalysis(n_components=1),
-    'LDA 2' : LinearDiscriminantAnalysis(n_components=2),
-    'LDA 3' : LinearDiscriminantAnalysis(n_components=3)
+    'LDA 1' : LinearDiscriminantAnalysis(n_components=1)
+    #'LDA 2' : LinearDiscriminantAnalysis(n_components=2),
+    #'LDA 3' : LinearDiscriminantAnalysis(n_components=3)
     }
 
 TimeParams_list = [
@@ -75,8 +75,8 @@ TimeParams_list = [
     'Variance',
     'Mean'
     ]
-#%%
-_ = conditions_fwd_select(Raw_data, conditions, KNN_models, TimeParams_list, 'win20_olap0')
-_ = conditions_fwd_select(Raw_data, conditions, KNN_models, TimeParams_list, 'win20_olap5')
-_ = conditions_fwd_select(Raw_data, conditions, KNN_models, TimeParams_list, 'win15_olap5')
-_ = conditions_fwd_select(Raw_data, conditions, KNN_models, TimeParams_list, 'win10_olap5')
+#%% RUN MODELS
+_ = conditions_fwd_select(Raw_data, conditions, LDA_models, TimeParams_list, 'win20_olap0')
+_ = conditions_fwd_select(Raw_data, conditions, LDA_models, TimeParams_list, 'win20_olap5')
+_ = conditions_fwd_select(Raw_data, conditions, LDA_models, TimeParams_list, 'win15_olap5')
+_ = conditions_fwd_select(Raw_data, conditions, LDA_models, TimeParams_list, 'win10_olap5')
