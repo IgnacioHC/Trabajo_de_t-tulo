@@ -6,14 +6,12 @@ Created on Thu Jun 10 14:52:27 2021
 """
 #%% IMPORTS
 import numpy as np
-import pandas as pd
 
 from sklearn.ensemble import RandomForestClassifier
 from sklearn.neighbors import KNeighborsClassifier
 from sklearn.discriminant_analysis import LinearDiscriminantAnalysis
 
 from utils.utils_forward_selection import conditions_fwd_select
-from utils.utils_preprocessing import preprocess_data
 #%% LOAD DATA
 folder = 'data/data_raw/'
 Raw_data = {
@@ -43,7 +41,7 @@ conditions = {
     'valve' : np.loadtxt(labels_folder + 'labels_valve.txt'),
     'pump' : np.loadtxt(labels_folder + 'labels_pump.txt'),
     'accumulator' : np.loadtxt(labels_folder + 'labels_accumulator.txt'),
-    'stable_flag' : np.loadtxt(labels_folder + 'labels_stableFlag.txt')
+    'stableFlag' : np.loadtxt(labels_folder + 'labels_stableFlag.txt')
     }
 #%% MODELS
 KNN_models = {
@@ -54,6 +52,7 @@ KNN_models = {
     'KNN 5' : KNeighborsClassifier(n_neighbors=5),
     'KNN 6' : KNeighborsClassifier(n_neighbors=6)
     }
+#
 
 RF_models = {
     'RF 40' : RandomForestClassifier(n_estimators=40),
@@ -62,6 +61,14 @@ RF_models = {
     'RF 100' : RandomForestClassifier(n_estimators=100),
     'RF 120' : RandomForestClassifier(n_estimators=120)
     }
+
+#criterion
+
+# SVM_models = {
+    
+    
+#     }
+
 
 LDA_models = {
     'LDA 1' : LinearDiscriminantAnalysis(n_components=1)
@@ -75,8 +82,19 @@ TimeParams_list = [
     'Variance',
     'Mean'
     ]
+#%% TIME WINDOWS
+time_windows_params = [
+    'win60_olap0', # 1 per instance 
+    'win30_olap0', # 2 per instance
+    'win20_olap0', # 3 per instancw
+    'win22_olap10',# 4 per instance
+    'win20_olap10',# 5 per instance
+    'win18_olap10',# 6 per instance
+    'win15_olap8',# 7 per instance
+    'win14_olap14' # 8 per instance
+    ]
 #%% RUN MODELS
-_ = conditions_fwd_select(Raw_data, conditions, LDA_models, TimeParams_list, 'win20_olap0')
-_ = conditions_fwd_select(Raw_data, conditions, LDA_models, TimeParams_list, 'win20_olap5')
-_ = conditions_fwd_select(Raw_data, conditions, LDA_models, TimeParams_list, 'win15_olap5')
-_ = conditions_fwd_select(Raw_data, conditions, LDA_models, TimeParams_list, 'win10_olap5')
+for win_olap_str in time_windows_params:
+    _ = conditions_fwd_select(Raw_data, conditions, RF_models, TimeParams_list,
+                              win_olap_str)
+

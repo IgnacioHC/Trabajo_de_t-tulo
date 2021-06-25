@@ -123,7 +123,7 @@ def get_TimeParam_dict(RawData_dict, time_param, t_win = 20,
         for instance_idx in range(sensor_data.shape[0]):
             array_TimeParam = to_TimeParam(sensor_data[instance_idx,:],
                                            time_param, t_win, t_olap)            
-            array_concat = np.concatenate((array_concat,array_TimeParam),axis=0)
+            array_concat = np.concatenate((array_concat,array_TimeParam), axis=0)
         TimeParam_dict[sensor_name] = array_concat
     return TimeParam_dict
 #%%
@@ -160,7 +160,8 @@ def split_classes(sensor_data,condition_name,condition_labels):
         #Iterate over class indexes
         for old_idx in class_oldindxs:
             #Create the new indexes from 0 to 2205*win_per_instance-1
-            new_idx = old_idx*win_per_instance + np.linspace(0,win_per_instance-1,win_per_instance)
+            new_idx = old_idx*win_per_instance + np.linspace(0, win_per_instance-1, 
+                                                             win_per_instance)
             class_newindxs = np.concatenate((class_newindxs,new_idx),axis=0)
         splited_classes[class_name] = sensor_data[class_newindxs.astype(int)]
     return splited_classes
@@ -214,7 +215,7 @@ def plot_TimeParam(TimeParam_dict,condition_name,condition_labels,time_param,
             stop = class_TimeParam_data.shape[0]
             x = np.linspace(1, stop,stop)
             plt.scatter(x, class_TimeParam_data, label=class_name)
-       #FigText
+        #FigText
         title1 = time_param + ' from ' + sensor_name
         title2 = '\n Classification: ' + condition_name 
         title = title1 + title2
@@ -333,16 +334,17 @@ def preprocess_data(RawData_dict, condition_labels, time_param, t_win, t_olap,
     #Scale data
     for sensor_name , sensor_train_data in TimeParam_dict_train.items():
         sensor_test_data = TimeParam_dict_test[sensor_name]
+        #Concatenate train and test sensor data to fit the scaler
         concat_array = np.concatenate([sensor_train_data, sensor_test_data], axis=0)
+        #Initialize and fit the scaler
         scaler_fit = MinMaxScaler(copy=False).fit(concat_array.reshape(-1,1))
+        #Scale train and test data
         scaler_fit.transform(sensor_train_data.reshape(-1,1))
         scaler_fit.transform(TimeParam_dict_test[sensor_name].reshape(-1,1))
     #Get time param DataFrames
     TimeParam_df_train =  pd.DataFrame.from_dict(TimeParam_dict_train)
     TimeParam_df_test =  pd.DataFrame.from_dict(TimeParam_dict_test)
-    #Get sets
-    # X_train = TimeParam_df_train.values
-    # X_test = TimeParam_df_test.values
+    #Get new labels with the shapes of the time windows
     Y_train = get_Y(Y_train, t_win, t_olap)
     Y_test = get_Y(Y_test, t_win, t_olap)
     return TimeParam_df_train, TimeParam_df_test, Y_train, Y_test

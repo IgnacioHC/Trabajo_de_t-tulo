@@ -122,53 +122,6 @@ def get_MeasureUnit(sensor_name):
         if key == sensor_name:
             return measurement_units_dict[sensor_name]
 #%%
-def get_MeasureUnit_ES(sensor_name):
-    """
-    Returns a str with the sensor's measurement unit.
-    
-    --------------------------------------------------------------------------
-    Parameters
-    
-    sensor_name: {'Temperature sensor 1','Temperature sensor 2',
-                  'Temperature sensor 3','Temperature sensor 4',
-                  'Vibration sensor','Cooling efficiency','Cooling power',
-                  'Efficiency factor','Flow sensor 1','Flow sensor 2',
-                  'Pressure sensor 1','Pressure sensor 2','Pressure sensor 3',
-                  'Pressure sensor 4','Pressure sensor 5','Pressure sensor 6',
-                  'Motor power'}
-        sensor's name as str to be matched to their corresponding
-        measurement unit.
-    
-    --------------------------------------------------------------------------
-    Returns
-    
-    out: str
-        measurement unit as str.
-    
-    """
-    measurement_units_dict = {
-          'Temperature sensor 1' : 'Temperatura [°C]',
-          'Temperature sensor 2' : 'Temperatura [°C]',
-          'Temperature sensor 3' : 'Temperatura [°C]',
-          'Temperature sensor 4' : 'Temperatura [°C]',
-          'Vibration sensor' : 'Velocidad [mm/s]',
-          'Cooling efficiency' : 'Eficiencia [%]',
-          'Cooling power' : 'Potencia [kW]',
-          'Efficiency factor' : 'Eficiencia [%]',
-          'Flow sensor 1' : 'Flujo de agua [L/min]',
-          'Flow sensor 2' : 'Flujo de agua [L/min]',
-          'Pressure sensor 1' : 'Presión [bar]',
-          'Pressure sensor 2' : 'Presión [bar]',
-          'Pressure sensor 3' : 'Presión [bar]',
-          'Pressure sensor 4' : 'Presión [bar]',
-          'Pressure sensor 5' : 'Presión [bar]',
-          'Pressure sensor 6' : 'Presión [bar]',
-          'Motor power' : 'Potencia [W]'
-          }
-    for key in measurement_units_dict.keys():
-        if key == sensor_name:
-            return measurement_units_dict[sensor_name]
-#%%
 def plt_RawSignals(RawData_dict,condition_name,condition_labels,
                    fig_sz=(14,9),dpi=200,subplt=(6,3)):
     """
@@ -213,6 +166,119 @@ def plt_RawSignals(RawData_dict,condition_name,condition_labels,
         plt.title(title,size=12)
         plt.xlabel('Time [seconds]',size=11)
         plt.ylabel(get_MeasureUnit(sensor_name),size=11)
+        plt.legend()      
+    plt.tight_layout()
+    plt.show()
+#%%
+def plt_RawSignalsES(RawData_dict, condition_name, condition_labels,
+                     fig_sz=(14,9), dpi=200, subplt=(6,3)):
+    """
+    Plotea las señales en raw para cada sensor.
+    --------------------------------------------------------------------------
+    Returns
+    out: plots
+    """
+    Nombres_clases = {
+        'Cooler condition':{
+            'Close to total failure':3,
+            'Reduced effifiency':20,
+            'Full efficiency':100
+        },
+        'Valve condition':{
+            'Optimal switching behavior':100,
+            'Small lag':90,
+            'Severe lag':80,
+            'Close to total failure':73
+        },
+        'Pump leakage':{
+            'No leakage':0,
+            'Weak leakage':1,
+            'Severe leakage':2
+        },
+        'Accumulator condition':{
+            'Optimal pressure':130,
+            'Slightly reduced pressure':115,
+            'Severely reduced pressure':100,
+            'Close to total failure':90
+        },
+        'Stable flag':{
+            'Stable' : 0,
+            'Not stable' : 1
+            #'Conditions were stable':0,
+            #'Static conditions might not have been reached yet':1
+        }    
+    }
+    condiciones = {
+        'Cooler condition' : 'Estado del enfriador',
+        'Valve condition' : 'Estado de la válvula',
+        'Pump Leakage' : 'Fuga en la bomba',
+        'Accumulator condition' : 'Estado del acumulador',
+        'Stable flag' : 'Estabilidad del sistema'
+        }
+    Unidades_de_medida = {
+          'Temperature sensor 1' : 'Temperatura [°C]',
+          'Temperature sensor 2' : 'Temperatura [°C]',
+          'Temperature sensor 3' : 'Temperatura [°C]',
+          'Temperature sensor 4' : 'Temperatura [°C]',
+          'Vibration sensor' : 'Velocidad [mm/s]',
+          'Cooling efficiency' : 'Eficiencia [%]',
+          'Cooling power' : 'Potencia [kW]',
+          'Efficiency factor' : 'Eficiencia [%]',
+          'Flow sensor 1' : 'Flujo de agua [L/min]',
+          'Flow sensor 2' : 'Flujo de agua [L/min]',
+          'Pressure sensor 1' : 'Presión [bar]',
+          'Pressure sensor 2' : 'Presión [bar]',
+          'Pressure sensor 3' : 'Presión [bar]',
+          'Pressure sensor 4' : 'Presión [bar]',
+          'Pressure sensor 5' : 'Presión [bar]',
+          'Pressure sensor 6' : 'Presión [bar]',
+          'Motor power' : 'Potencia [W]'
+          }
+    Nombre_sensores = {
+          'Temperature sensor 1' : 'Sensor de temperatura 1',
+          'Temperature sensor 2' : 'Sensor de temperatura 2',
+          'Temperature sensor 3' : 'Sensor de temperatura 3',
+          'Temperature sensor 4' : 'Sensor de temperatura 4',
+          'Vibration sensor' : 'Sensor de vibración',
+          'Cooling efficiency' : 'Eficiencia [%]',
+          'Cooling power' : 'Potencia [kW]',
+          'Efficiency factor' : 'Eficiencia [%]',
+          'Flow sensor 1' : 'Flujo de agua [L/min]',
+          'Flow sensor 2' : 'Flujo de agua [L/min]',
+          'Pressure sensor 1' : 'Presión [bar]',
+          'Pressure sensor 2' : 'Presión [bar]',
+          'Pressure sensor 3' : 'Presión [bar]',
+          'Pressure sensor 4' : 'Presión [bar]',
+          'Pressure sensor 5' : 'Presión [bar]',
+          'Pressure sensor 6' : 'Presión [bar]',
+          'Motor power' : 'Potencia [W]'
+          }
+    
+    plt.figure(figsize=fig_sz , dpi=dpi)  
+    #Get random indxs for each class
+    indexes = get_classes_idx(condition_name,condition_labels)
+    #Subplots
+    for sensor_name in list(RawData_dict): 
+        sensor_data = RawData_dict[sensor_name] 
+        #Time vector
+        len_TimeVector = sensor_data.shape[1]
+        dt = 60/len_TimeVector
+        t = np.linspace(0,dt*(len_TimeVector-1),len_TimeVector)
+        #Subplot position
+        i = list(RawData_dict).index(sensor_name) + 1
+        m, n = subplt
+        plt.subplot(m, n, i)
+        #Iter over classes        
+        for class_name , class_idx in indexes.items():
+            plt.plot(t, sensor_data[class_idx,:],
+                     label = Nombres_clases[condition_name][class_name])
+        #FigText
+        head_title = 'Señal sin procesar ' + condiciones[condition_name]
+        tail_title = '\n{}'.format(Nombre_sensores[sensor_name])
+        title = head_title + tail_title
+        plt.title(title,size=12)
+        plt.xlabel('Tiempo [segundos]',size=11)
+        plt.ylabel(Unidades_de_medida[sensor_name ], size=11)
         plt.legend()      
     plt.tight_layout()
     plt.show()

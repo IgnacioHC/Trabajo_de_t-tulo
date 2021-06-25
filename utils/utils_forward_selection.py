@@ -11,10 +11,8 @@ import json
 import time
 
 from sklearn.metrics import accuracy_score
-from sklearn.model_selection import train_test_split
 from sklearn.discriminant_analysis import LinearDiscriminantAnalysis
 
-from utils.utils_preprocessing import get_Y
 from utils.utils_preprocessing import preprocess_data
 #%% Sensor names list
 all_sensors = ['Temperature sensor 1', #0
