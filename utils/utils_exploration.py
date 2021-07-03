@@ -197,8 +197,8 @@ def plt_RawSignalsES(RawData_dict, condition_name, condition_labels,
         },
         'Accumulator condition':{
             'Optimal pressure': 'Presión óptima',
-            'Slightly reduced pressure': '',
-            'Severely reduced pressure':100,
+            'Slightly reduced pressure': 'Presión ligeramente reducida',
+            'Severely reduced pressure': 'Presión severamente reducida',
             'Close to total failure':'Cerca de la falla total'
         },
         'Stable flag':{
@@ -209,7 +209,7 @@ def plt_RawSignalsES(RawData_dict, condition_name, condition_labels,
     condiciones = {
         'Cooler condition' : 'estado del enfriador',
         'Valve condition' : 'estado de la válvula',
-        'Pump Leakage' : 'fuga en la bomba',
+        'Pump leakage' : 'fuga en la bomba',
         'Accumulator condition' : 'estado del acumulador',
         'Stable flag' : 'estabilidad del sistema'
         }

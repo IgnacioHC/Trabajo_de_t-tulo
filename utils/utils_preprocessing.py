@@ -227,44 +227,6 @@ def plot_TimeParam(TimeParam_dict,condition_name,condition_labels,time_param,
     plt.tight_layout()
     plt.show()
 #%%
-def plot_TimeParamES(TimeParam_dict,condition_name,condition_labels,time_param,
-                     fig_sz=(20,18)):   
-    """
-    Misma función que la anterior, pero plotea en español.
-    """
-    
-    Parametros_tiempo = {
-        'RMS':'RMS',
-        'P2P':'P2P',
-        'Variance':'Varianza',
-        'Mean':'Media'}
-    #Figure settings
-    plt.figure(figsize=fig_sz , dpi=200)
-    #Iterate over sensors
-    for sensor_name in list(TimeParam_dict):
-        #Subplot position
-        i = list(TimeParam_dict).index(sensor_name) + 1
-        plt.subplot(np.ceil(len(list(TimeParam_dict))/3).astype(int), 3,i)
-        #Iterate over condition classes
-        classes_dict = split_classes(sensor_data = TimeParam_dict[sensor_name],
-                                     condition_name = condition_name,
-                                     condition_labels = condition_labels)      
-        for class_name , class_TimeParam_data in classes_dict.items():
-            stop = class_TimeParam_data.shape[0]
-            x = np.linspace(1, stop,stop)
-            plt.scatter(x, class_TimeParam_data, label=class_name)
-       #FigText
-        title1 = time_param + ' obtenido del sensor '#+ TimeParam_df.columns[i]
-        title2 = '\n Clasificasión: ' + condition_name 
-        title = title1 + title2
-        plt.title(title,size=10)
-        plt.xlabel('Número de ventana temporal',size=8)
-        plt.ylabel(Parametros_tiempo[time_param],size=8)    
-        #Legend
-        plt.legend()
-    plt.tight_layout()
-    plt.show()
-#%%
 def split_data(dataRaw_dict, condition_labels, train_sz=0.7, random_st=19):
     RawData_dict_train, RawData_dict_test = {}, {} 
     for sensor_name, sensor_RawData in dataRaw_dict.items():
@@ -348,3 +310,41 @@ def preprocess_data(RawData_dict, condition_labels, time_param, t_win, t_olap,
     Y_train = get_Y(Y_train, t_win, t_olap)
     Y_test = get_Y(Y_test, t_win, t_olap)
     return TimeParam_df_train, TimeParam_df_test, Y_train, Y_test
+#%%
+def plot_TimeParamES(TimeParam_dict,condition_name,condition_labels,time_param,
+                     fig_sz=(20,18)):   
+    """
+    Misma función que la anterior, pero plotea en español.
+    """
+    
+    Parametros_tiempo = {
+        'RMS':'RMS',
+        'P2P':'P2P',
+        'Variance':'Varianza',
+        'Mean':'Media'}
+    #Figure settings
+    plt.figure(figsize=fig_sz , dpi=200)
+    #Iterate over sensors
+    for sensor_name in list(TimeParam_dict):
+        #Subplot position
+        i = list(TimeParam_dict).index(sensor_name) + 1
+        plt.subplot(np.ceil(len(list(TimeParam_dict))/3).astype(int), 3,i)
+        #Iterate over condition classes
+        classes_dict = split_classes(sensor_data = TimeParam_dict[sensor_name],
+                                     condition_name = condition_name,
+                                     condition_labels = condition_labels)      
+        for class_name , class_TimeParam_data in classes_dict.items():
+            stop = class_TimeParam_data.shape[0]
+            x = np.linspace(1, stop,stop)
+            plt.scatter(x, class_TimeParam_data, label=class_name)
+       #FigText
+        title1 = time_param + ' obtenido del sensor '#+ TimeParam_df.columns[i]
+        title2 = '\n Clasificasión: ' + condition_name 
+        title = title1 + title2
+        plt.title(title,size=10)
+        plt.xlabel('Número de ventana temporal',size=8)
+        plt.ylabel(Parametros_tiempo[time_param],size=8)    
+        #Legend
+        plt.legend()
+    plt.tight_layout()
+    plt.show()
