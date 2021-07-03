@@ -311,10 +311,10 @@ def preprocess_data(RawData_dict, condition_labels, time_param, t_win, t_olap,
     Y_test = get_Y(Y_test, t_win, t_olap)
     return TimeParam_df_train, TimeParam_df_test, Y_train, Y_test
 #%%
-def plot_TimeParamES(TimeParam_dict,condition_name,condition_labels,time_param,
-                     fig_sz=(20,18)):   
+def plot_TimeParamES(TimeParam_dict, condition_name, condition_labels, 
+                     time_param, fig_sz=(20,18)):   
     """
-    Misma función que la anterior, pero plotea en español.
+    Misma función que plot_TimeParam, pero plotea en español.
     """
     
     Parametros_tiempo = {
@@ -322,6 +322,56 @@ def plot_TimeParamES(TimeParam_dict,condition_name,condition_labels,time_param,
         'P2P':'P2P',
         'Variance':'Varianza',
         'Mean':'Media'}
+
+    Nombres_clases = {
+        'Cooler condition':{
+            'Close to total failure': 'Cerca de la falla total',
+            'Reduced effifiency':'Eficiencia reducida',
+            'Full efficiency':'Eficiencia total'
+        },
+        'Valve condition':{
+            'Optimal switching behavior': 'Comportamiento óptimo del switch',
+            'Small lag': 'Pequeño retraso del switch',
+            'Severe lag': 'Retraso severo del switch',
+            'Close to total failure':'Cerca de la falla total'
+        },
+        'Pump leakage':{
+            'No leakage': 'Sin fuga',
+            'Weak leakage': 'Fuga leve',
+            'Severe leakage': 'Fuga severa'
+        },
+        'Accumulator condition':{
+            'Optimal pressure': 'Presión óptima',
+            'Slightly reduced pressure': 'Presión ligeramente reducida',
+            'Severely reduced pressure': 'Presión severamente reducida',
+            'Close to total failure':'Cerca de la falla total'
+        },
+        'Stable flag':{
+            'Stable' : 'Sistema estable',
+            'Not stable' : 'Sistema no estable'
+        }    
+    }
+
+    Nombre_sensores = {
+          'Temperature sensor 1' : 'Sensor de temperatura 1',
+          'Temperature sensor 2' : 'Sensor de temperatura 2',
+          'Temperature sensor 3' : 'Sensor de temperatura 3',
+          'Temperature sensor 4' : 'Sensor de temperatura 4',
+          'Vibration sensor' : 'Sensor de vibración',
+          'Cooling efficiency' : 'Eficiencia del enfriador',
+          'Cooling power' : 'Potencia del enfriador',
+          'Efficiency factor' : 'Factor de eficiencia',
+          'Flow sensor 1' : 'Sensor de lujo de agua',
+          'Flow sensor 2' : 'Sensor de flujo de agua',
+          'Pressure sensor 1' : 'Sensor de presión 1',
+          'Pressure sensor 2' : 'Sensor de presión 2',
+          'Pressure sensor 3' : 'Sensor de presión 3',
+          'Pressure sensor 4' : 'Sensor de presión 4',
+          'Pressure sensor 5' : 'Sensor de presión 5',
+          'Pressure sensor 6' : 'Sensor de presión 6',
+          'Motor power' : 'Potencia del motor'
+          }
+
     #Figure settings
     plt.figure(figsize=fig_sz , dpi=200)
     #Iterate over sensors
@@ -336,14 +386,16 @@ def plot_TimeParamES(TimeParam_dict,condition_name,condition_labels,time_param,
         for class_name , class_TimeParam_data in classes_dict.items():
             stop = class_TimeParam_data.shape[0]
             x = np.linspace(1, stop,stop)
-            plt.scatter(x, class_TimeParam_data, label=class_name)
-       #FigText
-        title1 = time_param + ' obtenido del sensor '#+ TimeParam_df.columns[i]
-        title2 = '\n Clasificasión: ' + condition_name 
-        title = title1 + title2
-        plt.title(title,size=10)
-        plt.xlabel('Número de ventana temporal',size=8)
-        plt.ylabel(Parametros_tiempo[time_param],size=8)    
+            plt.scatter(x, class_TimeParam_data,
+                        label = Nombres_clases[condition_name][class_name])
+        #FigText
+        upper_tit1 = Parametros_tiempo[time_param] + ' obtenida de: '
+        upper_tit2 = Nombre_sensores[sensor_name]
+        lower_tit = '\n Clasificasión: ' + condition_name 
+        title = upper_tit1 + upper_tit2 + lower_tit
+        plt.title(title, size=10)
+        plt.xlabel('Número de ventana temporal', size = 8)
+        plt.ylabel(Parametros_tiempo[time_param], size=8)    
         #Legend
         plt.legend()
     plt.tight_layout()
