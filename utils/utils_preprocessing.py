@@ -371,6 +371,13 @@ def plot_TimeParamES(TimeParam_dict, condition_name, condition_labels,
           'Pressure sensor 6' : 'Sensor de presión 6',
           'Motor power' : 'Potencia del motor'
           }
+    condiciones = {
+        'Cooler condition' : 'estado del enfriador',
+        'Valve condition' : 'estado de la válvula',
+        'Pump leakage' : 'fuga en la bomba',
+        'Accumulator condition' : 'estado del acumulador',
+        'Stable flag' : 'estabilidad del sistema'
+        }    
 
     #Figure settings
     plt.figure(figsize=fig_sz , dpi=200)
@@ -391,11 +398,11 @@ def plot_TimeParamES(TimeParam_dict, condition_name, condition_labels,
         #FigText
         upper_tit1 = Parametros_tiempo[time_param] + ' obtenida de: '
         upper_tit2 = Nombre_sensores[sensor_name]
-        lower_tit = '\n Clasificasión: ' + condition_name 
+        lower_tit = '\n Clasificasión: ' + condiciones[condition_name]
         title = upper_tit1 + upper_tit2 + lower_tit
         plt.title(title, size=10)
         plt.xlabel('Número de ventana temporal', size = 8)
-        plt.ylabel(Parametros_tiempo[time_param], size=8)    
+        plt.ylabel(Parametros_tiempo[time_param], size = 8)    
         #Legend
         plt.legend()
     plt.tight_layout()
