@@ -372,11 +372,11 @@ def plot_TimeParamES(TimeParam_dict, condition_name, condition_labels,
           'Motor power' : 'Potencia del motor'
           }
     condiciones = {
-        'Cooler condition' : 'estado del enfriador',
-        'Valve condition' : 'estado de la válvula',
-        'Pump leakage' : 'fuga en la bomba',
-        'Accumulator condition' : 'estado del acumulador',
-        'Stable flag' : 'estabilidad del sistema'
+        'Cooler condition' : 'Estado del enfriador',
+        'Valve condition' : 'Estado de la válvula',
+        'Pump leakage' : 'Fuga en la bomba',
+        'Accumulator condition' : 'Estado del acumulador',
+        'Stable flag' : 'Estabilidad del sistema'
         }    
 
     #Figure settings
