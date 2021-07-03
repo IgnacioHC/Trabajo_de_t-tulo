@@ -180,40 +180,38 @@ def plt_RawSignalsES(RawData_dict, condition_name, condition_labels,
     """
     Nombres_clases = {
         'Cooler condition':{
-            'Close to total failure':3,
-            'Reduced effifiency':20,
-            'Full efficiency':100
+            'Close to total failure': 'Cerca de la falla total',
+            'Reduced effifiency':'Eficiencia reducida',
+            'Full efficiency':'Eficiencia total'
         },
         'Valve condition':{
-            'Optimal switching behavior':100,
-            'Small lag':90,
-            'Severe lag':80,
-            'Close to total failure':73
+            'Optimal switching behavior': 'Comportamiento óptimo del switch',
+            'Small lag': 'Pequeño retraso del switch',
+            'Severe lag': 'Retraso severo del switch',
+            'Close to total failure':'Cerca de la falla total'
         },
         'Pump leakage':{
-            'No leakage':0,
-            'Weak leakage':1,
-            'Severe leakage':2
+            'No leakage': 'Sin fuga',
+            'Weak leakage': 'Fuga leve',
+            'Severe leakage': 'Fuga severa'
         },
         'Accumulator condition':{
-            'Optimal pressure':130,
-            'Slightly reduced pressure':115,
+            'Optimal pressure': 'Presión óptima',
+            'Slightly reduced pressure': '',
             'Severely reduced pressure':100,
-            'Close to total failure':90
+            'Close to total failure':'Cerca de la falla total'
         },
         'Stable flag':{
-            'Stable' : 0,
-            'Not stable' : 1
-            #'Conditions were stable':0,
-            #'Static conditions might not have been reached yet':1
+            'Stable' : 'Sistema estable',
+            'Not stable' : 'Sistema no estable'
         }    
     }
     condiciones = {
-        'Cooler condition' : 'Estado del enfriador',
-        'Valve condition' : 'Estado de la válvula',
-        'Pump Leakage' : 'Fuga en la bomba',
-        'Accumulator condition' : 'Estado del acumulador',
-        'Stable flag' : 'Estabilidad del sistema'
+        'Cooler condition' : 'estado del enfriador',
+        'Valve condition' : 'estado de la válvula',
+        'Pump Leakage' : 'fuga en la bomba',
+        'Accumulator condition' : 'estado del acumulador',
+        'Stable flag' : 'estabilidad del sistema'
         }
     Unidades_de_medida = {
           'Temperature sensor 1' : 'Temperatura [°C]',
@@ -240,18 +238,18 @@ def plt_RawSignalsES(RawData_dict, condition_name, condition_labels,
           'Temperature sensor 3' : 'Sensor de temperatura 3',
           'Temperature sensor 4' : 'Sensor de temperatura 4',
           'Vibration sensor' : 'Sensor de vibración',
-          'Cooling efficiency' : 'Eficiencia [%]',
-          'Cooling power' : 'Potencia [kW]',
-          'Efficiency factor' : 'Eficiencia [%]',
-          'Flow sensor 1' : 'Flujo de agua [L/min]',
-          'Flow sensor 2' : 'Flujo de agua [L/min]',
-          'Pressure sensor 1' : 'Presión [bar]',
-          'Pressure sensor 2' : 'Presión [bar]',
-          'Pressure sensor 3' : 'Presión [bar]',
-          'Pressure sensor 4' : 'Presión [bar]',
-          'Pressure sensor 5' : 'Presión [bar]',
-          'Pressure sensor 6' : 'Presión [bar]',
-          'Motor power' : 'Potencia [W]'
+          'Cooling efficiency' : 'Eficiencia del cooler',
+          'Cooling power' : 'Potencia del cooler',
+          'Efficiency factor' : 'Factor de eficiencia',
+          'Flow sensor 1' : 'Sensor de lujo de agua',
+          'Flow sensor 2' : 'Sensor de flujo de agua',
+          'Pressure sensor 1' : 'Sensor de presión 1',
+          'Pressure sensor 2' : 'Sensor de presión 2',
+          'Pressure sensor 3' : 'Sensor de presión 3',
+          'Pressure sensor 4' : 'Sensor de presión 4',
+          'Pressure sensor 5' : 'Sensor de presión 5',
+          'Pressure sensor 6' : 'Sensor de presión 6',
+          'Motor power' : 'Potencia del motor'
           }
     
     plt.figure(figsize=fig_sz , dpi=dpi)  
@@ -273,7 +271,7 @@ def plt_RawSignalsES(RawData_dict, condition_name, condition_labels,
             plt.plot(t, sensor_data[class_idx,:],
                      label = Nombres_clases[condition_name][class_name])
         #FigText
-        head_title = 'Señal sin procesar ' + condiciones[condition_name]
+        head_title = 'Señal sin procesar de ' + condiciones[condition_name]
         tail_title = '\n{}'.format(Nombre_sensores[sensor_name])
         title = head_title + tail_title
         plt.title(title,size=12)
