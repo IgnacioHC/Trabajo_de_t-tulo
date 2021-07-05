@@ -149,30 +149,15 @@ def forward_select(model, TimeParam_df_train, TimeParam_df_test, Y_train,
     accuracies = []
     good_idxs = []
     #Iteration 1
-    # if lda == True:
-    #     Model = LinearDiscriminantAnalysis(n_components=1)
-    #     max_acc, max_idxs = get_BestCombination(TimeParam_df, sensors_idx_list,
-    #                                             good_idxs, Model,
-    #                                             condition_labels)
-    # else:
-    #     pass
-    max_acc, max_idxs = get_BestCombination(TimeParam_df_train, TimeParam_df_test,
+    max_acc, max_idxs = get_BestCombination(TimeParam_df_train,
+                                            TimeParam_df_test,
                                             sensors_idx_list , good_idxs,
                                             model, Y_train, Y_test)
     accuracies.append(max_acc)
     
     # Iteration 2
-    sensors_idx_list.remove(max_idxs[0])
-    old_good_idxs = good_idxs
-    good_idxs.append(max_idxs[0])
-    # if lda == True and model != LinearDiscriminantAnalysis(n_components=1):
-    #     Model = LinearDiscriminantAnalysis(n_components=2)
-    #     max_acc, max_idxs = get_BestCombination(TimeParam_df, sensors_idx_list,
-    #                                             good_idxs, Model,
-    #                                             condition_labels)
-    # else:
-    #     pass
-    max_acc, max_idxs = get_BestCombination(TimeParam_df_train, TimeParam_df_test,
+    max_acc, max_idxs = get_BestCombination(TimeParam_df_train,
+                                            TimeParam_df_test,
                                             sensors_idx_list , good_idxs,
                                             model, Y_train, Y_test)
     accuracies.append(max_acc)
@@ -409,23 +394,28 @@ def model_fwd_select(models_dict, conditions_labels, TimeParams_df_dict):
         times_DataFrame = pd.DataFrame(times_series, index = idx)
     return accuracies_DataFrame, models_idxs_dict, times_DataFrame
 #%%
-def save_accuracies(models_dict, condition_name, cond_accuracies,win_olap_str):
+def save_accuracies(models_dict, condition_name, cond_accuracies,win_olap_str,
+                    RF_iter = 1):
     models_name = list(models_dict.keys())[0].split(' ')[0]
+    #models_name = 'RF_it1'
     head = 'results/accuracies/' + condition_name + '/' + win_olap_str + '/'
     tail = condition_name + '_' + models_name + '_' + win_olap_str + '.csv'
     file_path = head + tail
     cond_accuracies.to_csv(file_path)
 #%%
-def save_MaxAcc_idxs(condition_idxs, models_dict, win_olap_str):
+def save_MaxAcc_idxs(condition_idxs, models_dict, win_olap_str, RF_iter = 1):
     models_name = list(models_dict.keys())[0].split(' ')[0]
+    #models_name = 'RF_it1'
     head_path = 'results/max_accuracy_idxs/' + win_olap_str + '/'
     tail_path = 'max_idxs_' + models_name + '_' + win_olap_str + '.json'
     file_path = head_path + tail_path
     with open(file_path, 'w') as fp:
         json.dump(condition_idxs, fp)
 #%%
-def save_times(models_dict, condition_name, cond_times, win_olap_str):
+def save_times(models_dict, condition_name, cond_times, win_olap_str,
+               RF_iter = 1):
     models_name = list(models_dict.keys())[0].split(' ')[0]
+    #models_name = 'RF_it1'
     head = 'results/execution_times/' + condition_name + '/' + win_olap_str
     tail = '/times_' + condition_name + '_' + models_name + '_' + win_olap_str + '.csv'
     file_path = head + tail
@@ -453,7 +443,7 @@ def conditions_fwd_select(RawData_dict, conditions_dict, models_dict,
     conditions_times = {}
     win = int(win_olap_str.split('_')[0][3:])
     olap = int(win_olap_str.split('_')[0][4:])
-    for condition_name, condition_labels in conditions_dict.items():
+    for condition_name, condition_labels in conditions_dict.items():   
         #Get TimeParams_df_dict
         TimeParams_df_dict = get_TimeParams_df_dict(TimeParams_list,
                                                     RawData_dict, 
@@ -470,7 +460,8 @@ def conditions_fwd_select(RawData_dict, conditions_dict, models_dict,
         condition_idxs[condition_name] = models_idxs
         conditions_times[condition_name] = times
         if save == True:
-            save_accuracies(models_dict, condition_name, accuracies, win_olap_str)
+            save_accuracies(models_dict, condition_name, accuracies,
+                                win_olap_str)
             save_times(models_dict, condition_name, times, win_olap_str)
         else:
             pass

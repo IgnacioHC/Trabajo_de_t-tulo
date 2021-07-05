@@ -10,8 +10,9 @@ import numpy as np
 from sklearn.ensemble import RandomForestClassifier
 from sklearn.neighbors import KNeighborsClassifier
 from sklearn.discriminant_analysis import LinearDiscriminantAnalysis
+from sklearn.svm import SVC
 
-from utils.utils_forward_selection import conditions_fwd_select
+from utils.utils_forward_select import conditions_fwd_select
 #%% LOAD DATA
 folder = 'data/data_raw/'
 Raw_data = {
@@ -24,7 +25,7 @@ Raw_data = {
     'Cooling power' : np.loadtxt(folder + "CP.txt"),
     'Efficiency factor' : np.loadtxt(folder + "SE.txt"),
     'Flow sensor 1' : np.loadtxt(folder + "FS1.txt"),
-    'Flow sensor 2' : np.loadtxt(folder + "FS2.txt"), #10
+    'Flow sensor 2' : np.loadtxt(folder + "FS2.txt"),
     'Pressure sensor 1' : np.loadtxt(folder + "PS1.txt"),
     'Pressure sensor 2' : np.loadtxt(folder + "PS2.txt"),
     'Pressure sensor 3' : np.loadtxt(folder + "PS3.txt"),
@@ -52,7 +53,6 @@ KNN_models = {
     'KNN 5' : KNeighborsClassifier(n_neighbors=5),
     'KNN 6' : KNeighborsClassifier(n_neighbors=6)
     }
-#
 
 RF_models = {
     'RF 40' : RandomForestClassifier(n_estimators=40),
@@ -62,22 +62,16 @@ RF_models = {
     'RF 120' : RandomForestClassifier(n_estimators=120)
     }
 
-#criterion
-
-# SVM_models = {
-    
-    
-#     }
-
-
-LDA_models = {
-    'LDA 1' : LinearDiscriminantAnalysis(n_components=1)
-    #'LDA 2' : LinearDiscriminantAnalysis(n_components=2),
-    #'LDA 3' : LinearDiscriminantAnalysis(n_components=3)
+SVM_models = {
+    'SVM rbf' : SVC(kernel='rbf'), 
+    'SVM linear' : SVC(kernel='linear'),
+    'SVM sigmoid' : SVC(kernel='sigmoid')     
     }
 
+LDA_models = {'LDA 1' : LinearDiscriminantAnalysis(n_components=1)}
+
 TimeParams_list = [
-    'RMS',
+    'RMS'
     'P2P',
     'Variance',
     'Mean'
@@ -86,15 +80,14 @@ TimeParams_list = [
 time_windows_params = [
     'win60_olap0', # 1 per instance 
     'win30_olap0', # 2 per instance
-    'win20_olap0', # 3 per instancw
+    'win20_olap0', # 3 per instance
     'win22_olap10',# 4 per instance
     'win20_olap10',# 5 per instance
     'win18_olap10',# 6 per instance
     'win15_olap8',# 7 per instance
-    'win14_olap14' # 8 per instance
     ]
 #%% RUN MODELS
 for win_olap_str in time_windows_params:
-    _ = conditions_fwd_select(Raw_data, conditions, RF_models, TimeParams_list,
+    _ = conditions_fwd_select(Raw_data, conditions, KNN_models, TimeParams_list,
                               win_olap_str)
-
+#%%

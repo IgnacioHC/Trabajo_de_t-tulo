@@ -38,10 +38,8 @@ ConditionsLabels_dict = {
         'Close to total failure':90
     },
     'Stable flag':{
-        'Stable' : 0,
-        'Not stable' : 1
-        #'Conditions were stable':0,
-        #'Static conditions might not have been reached yet':1
+        'Stable' : 0, # Conditions were stable
+        'Not stable' : 1 # Static conditions might not have been reached yet
     }    
 }
 #%% 

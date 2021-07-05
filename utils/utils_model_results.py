@@ -26,8 +26,7 @@ def load_condition_accuracies(cond_accuracies_path):
             window_accuracies[models_name] = pd.read_csv(models_path)
         condition_accuracies[window] = window_accuracies
     return condition_accuracies
-#Test
-#cooler_accuracies = load_condition_accuracies('results/accuracies/cooler/')
+
 #%% get_len_timeWindow
 def get_len_timeWindow(win_olap_str, train_sz = 0.7):
     """
@@ -37,19 +36,18 @@ def get_len_timeWindow(win_olap_str, train_sz = 0.7):
     train_instances = np.floor(2205 * train_sz).astype(int)
     len_per_instance = train_instances * int(np.floor((60-olap)/(win-olap)))
     return len_per_instance
-#test
-#timeWindow = get_len_timeWindow('win20_olap5')
+
 #%% plot_model_accuracies
-def plot_model_accuracies(condition_accuracies, fig_sz = (12,9)):
+def plot_model_accuracies(condition_accuracies, TimeParams_list,
+                          fig_sz = (12,9)):
     """
     Plotea las accuracies de los distintos modelos en funcion de el largo de
     la ventana de entrenamiento.
     """
     plt.figure(figsize = fig_sz, dpi = 200)
     #Iterate over Time params
-    TimeParams_list = ['RMS', 'P2P', 'Variance', 'Mean']
     for TimeParam, i in zip(TimeParams_list, range(len(TimeParams_list))):
-        plt.subplot(2, 2, i+1)
+        plt.subplot(np.ceil(len(TimeParams_list)/2).astype(int), 2, i+1)
         for win_olap_str, window_data in condition_accuracies.items():
             len_win = get_len_timeWindow(win_olap_str)
             for models_name, model_df in window_data.items():
@@ -62,13 +60,14 @@ def plot_model_accuracies(condition_accuracies, fig_sz = (12,9)):
         plt.ylabel('Model accuracy', size=8)
     
     plt.tight_layout()
-    plt.savefig('test_fig.png')
+    #plt.savefig('test_fig.png')
     plt.show()
 #%%
 condition_accuracies = load_condition_accuracies('results/accuracies/valve/')
 condition_accuracies = {'win20_olap5':condition_accuracies['win20_olap5'],
                         'win15_olap5':condition_accuracies['win15_olap5'],
                         'win10_olap5':condition_accuracies['win10_olap5']}
-        
-plot_model_accuracies(condition_accuracies)
+
+TimeParams_list = ['RMS', 'P2P', 'Variance', 'Mean']        
+plot_model_accuracies(condition_accuracies, TimeParams_list)
 
