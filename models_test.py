@@ -88,6 +88,6 @@ time_windows_params = [
     ]
 #%% RUN MODELS
 for win_olap_str in time_windows_params:
-    _ = conditions_fwd_select(Raw_data, conditions, KNN_models, TimeParams_list,
+    _ = conditions_fwd_select(Raw_data, conditions, SVM_models, TimeParams_list,
                               win_olap_str)
 #%%

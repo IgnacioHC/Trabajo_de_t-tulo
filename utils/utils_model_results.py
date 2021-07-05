@@ -63,11 +63,3 @@ def plot_model_accuracies(condition_accuracies, TimeParams_list,
     #plt.savefig('test_fig.png')
     plt.show()
 #%%
-condition_accuracies = load_condition_accuracies('results/accuracies/valve/')
-condition_accuracies = {'win20_olap5':condition_accuracies['win20_olap5'],
-                        'win15_olap5':condition_accuracies['win15_olap5'],
-                        'win10_olap5':condition_accuracies['win10_olap5']}
-
-TimeParams_list = ['RMS', 'P2P', 'Variance', 'Mean']        
-plot_model_accuracies(condition_accuracies, TimeParams_list)
-
