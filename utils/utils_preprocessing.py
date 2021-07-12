@@ -1,6 +1,8 @@
 # -*- coding: utf-8 -*-
 """
-@author: Ignacio
+Este archivo contiene funciones para obtener y plotear los parámetros de
+tiempo, además de otras funciones necesarias para entregar los conjuntos
+X_train, X_test, Y_train, Y_test.
 """
 #%% IMPORTS
 import numpy as np
@@ -15,25 +17,24 @@ def to_TimeParam(Xt, time_param, t_win = 20, t_olap = 0):
     """
     Calculates one of the time params (RMS , Variance, Mean) over time
     windows from sensor's instance data.   
-    
-    Parameters
     --------------------------------------------------------------------------
+    Parameters
     
     Xt: 1D np.array
         Array that contains the time data of 1 instance measured by the sensor. 
         
-    time_param:  {'RMS','Variance','Mean'}  
-        Name of the time parameter to be calculated 
+    time_param:  {'RMS', 'P2P', 'Variance', 'Mean'}  
+        Name of the time parameter to be calculated.
     
-    t_win: int (t_win<60), default=20
-        Window time length in seconds     
+    t_win: int (t_win<=60), default=20
+        Window time length in seconds.     
     
     t_olap: float, default=0
-        Overlap time length in seconds
+        Overlap time length in seconds.
     
     Returns
     --------------------------------------------------------------------------
-    out: numpy array with shape (win_per_instance,)
+    out: np.array with shape (win_per_instance,)
     
     """
     len_window = t_win/60 * Xt.shape[0] 
@@ -94,28 +95,28 @@ def get_TimeParam_dict(RawData_dict, time_param, t_win = 20,
                        t_olap = 0):
     """
     Calculates one of the time params over the time windows of each instance
-    from the given sensor's raw data   
-    
-    Parameters
+    from the given sensor's raw data.
     --------------------------------------------------------------------------
-    
+     Parameters
+     
     RawData_dict: dict
          Dict with the raw data from the sensors, in the form
          {sensor_name : data_raw}.  
         
-    time_param:  {'RMS','Variance','Mean'}  
+    time_param:  {'RMS', 'P2P', 'Variance', 'Mean'}  
         Name of the time parameter to be calculated 
     
     t_win: int (t_win<60) , default=20
-        Window time length in seconds     
+        Window time length in seconds.
     
     t_olap: float , default=0
-        Overlap time length in seconds
+        Overlap time length in seconds.
     
     Returns
     --------------------------------------------------------------------------
-    out: dict in the form {sensor_name : array_concat}. array_concat is the
-    array that contains the time params with shape (win_per_instance*2205,).  
+    out: dictionary 
+        Dict in the form {sensor_name : array_concat}. Array_concat is the
+        array that contains the time params with shape (win_per_instance*2205,)  
     """
     TimeParam_dict = {}
     for sensor_name , sensor_data in RawData_dict.items():        
@@ -127,16 +128,15 @@ def get_TimeParam_dict(RawData_dict, time_param, t_win = 20,
         TimeParam_dict[sensor_name] = array_concat
     return TimeParam_dict
 #%%
-def split_classes(sensor_data,condition_name,condition_labels):   
+def split_classes(sensor_data, condition_name, condition_labels):   
     """
-     Toma la data de un sensor como un 1D array, y la separa en sus
-     respectivas clases
-
-    Parameters
+     Toma la data de un sensor como un 1D array, y la separa en un array por
+     cada clase, retornando los arrays de cada clase en un diccionario.
     --------------------------------------------------------------------------
+    Parameters
     
     sensor_data: np.array
-        Data del sensor con shape (2205*win_per_instance,)
+        Sensor data with shape (2205*win_per_instance,)
         
     condition_name: {'Cooler condition','Valve condition','Pump leakage',
                      'Accumulator condition','Stable flag'}
@@ -147,8 +147,8 @@ def split_classes(sensor_data,condition_name,condition_labels):
         
     Returns
     --------------------------------------------------------------------------
-    out: dict 
-      
+    out: dictionary
+        Dictionary in the form {class_name : class_data}
     """    
     splited_classes = {}
     win_per_instance = int(sensor_data.shape[0]/2205)
@@ -166,35 +166,32 @@ def split_classes(sensor_data,condition_name,condition_labels):
         splited_classes[class_name] = sensor_data[class_newindxs.astype(int)]
     return splited_classes
 #%%
-def plot_TimeParam(TimeParam_dict,condition_name,condition_labels,time_param,
-                   fig_sz=(20,18)):   
+def plot_TimeParam(TimeParam_dict, condition_name, condition_labels,
+                   time_param, fig_sz=(20,18)):   
     """
     Plots the selected time parameter for each sensor data in data_dict as
     subplots in 1 figure. Every curve in each subplot represents a different
     class.
-
-    Parameters
     --------------------------------------------------------------------------
+    Parameters
     
-    data_dict: dict
+    TimeParam_dict: dict
         Contains time param data for every sensor as
-        {'sensor_name' : sensor_TimeParam}.
+        {'sensor_name' : sensor_TimeParam_data}.
        
     condition_name: {'Cooler condition','Valve condition','Pump leakage',
                       'Accumulator condition','Stable flag'}
-        Name of hydraulic system's condition to be clasified    
+        Name of hydraulic system's condition to be clasified.
+
+    condition_labels: np.array with shape (2205,)
+        Array that contains the class label for each instance
         
-    time_param:  {'RMS','Variance','Mean'}  
+    time_param:  {'RMS', 'P2P', 'Variance','Mean'}  
         Name of the time parameter to be calculated.    
         
-    subplt: (n:int,m:int) tuple , optional
-        Order of the subplots in the figure. total subplots = nxm.
-        n=rows , m=cols
-        
-    fig_sz (float,float) tuple, default=(14,10)
-        Size of the figure that contains the plots
-        
-        
+    fig_sz (float,float) tuple, default=(20,18)
+        Size of the figure that contains the plots.
+    
     Returns
     --------------------------------------------------------------------------
     out: plots 
@@ -228,6 +225,30 @@ def plot_TimeParam(TimeParam_dict,condition_name,condition_labels,time_param,
     plt.show()
 #%%
 def split_data(dataRaw_dict, condition_labels, train_sz=0.7, random_st=19):
+    """
+    --------------------------------------------------------------------------
+    Parameters
+    
+    dataRaw_dict: dict
+         Dict with the raw data from the sensors, in the form
+         {sensor_name : data_raw}.
+
+    condition_labels: np.array with shape (2205,)
+        Array that contains the class label for each instance
+        
+    train_sz: 0 <= float <= 1 , default=0.7
+        Name of the time parameter to be calculated.    
+        
+    random_st: int, default=19
+        random_state param for the train_test_split() function.
+    
+    Returns
+    --------------------------------------------------------------------------
+    out: tuple (RawData_dict_train, RawData_dict_test, Y_train, Y_test)
+        Tuple with the train and test data as dictionaries and the train and
+        test labels.
+      
+    """    
     RawData_dict_train, RawData_dict_test = {}, {} 
     for sensor_name, sensor_RawData in dataRaw_dict.items():
         sensor_sets = train_test_split(sensor_RawData, condition_labels,
@@ -240,12 +261,20 @@ def split_data(dataRaw_dict, condition_labels, train_sz=0.7, random_st=19):
 #%%
 def get_Y(condition_labels, t_win = 20, t_olap = 0):
     """
-     Toma el array con las etiquetas correspondientes a la clasificasión 
-     (condición de salud) con shape (2205,5) y retorna las etiquetas con shape
+     Toma el array con las etiquetas correspondientes a una condición a
+     clasificar, con shape (2205,5) y retorna nuevas etiquetas con shape
      (2205*win_per_instance,)
 
     Parameters
     --------------------------------------------------------------------------
+    condition_labels: np.array with shape (2205,)
+        Array that contains the class label for each instance
+    
+    t_win: int (t_win<60) , default=20
+        Window time length in seconds.
+    
+    t_olap: float , default=0
+        Overlap time length in seconds.
 
     Returns
     --------------------------------------------------------------------------
@@ -266,7 +295,7 @@ def preprocess_data(RawData_dict, condition_labels, time_param, t_win, t_olap,
                     train_sz = 0.7, random_st=19):
     """
      Utiliza las funciones anteriormente definidas para realizar el
-     preprocesamiento de los datos. Retorna los conjuntos X e Y
+     preprocesamiento de los datos.
 
     Parameters
     --------------------------------------------------------------------------
@@ -277,12 +306,26 @@ def preprocess_data(RawData_dict, condition_labels, time_param, t_win, t_olap,
        
     condition_labels: np.array with shape (2205,)
         Array that contains the class label for each instance
+
+    time_param:  {'RMS', 'P2P', 'Variance', 'Mean'}  
+        Name of the time parameter to be calculated 
+    
+    t_win: int (t_win<60) , default=20
+        Window time length in seconds.
+    
+    t_olap: float , default=0
+        Overlap time length in seconds.
+
+    train_sz: 0 <= float <= 1 , default=0.7
+        Name of the time parameter to be calculated.    
         
+    random_st: int, default=19
+        random_state param for the train_test_split() function.
         
     Returns
     --------------------------------------------------------------------------
     out: np.arrays
-    Returns the X_train,X_test,Y_train,Y_test sets
+        Returns the X_train,X_test,Y_train,Y_test sets
 
     """
     # Split data

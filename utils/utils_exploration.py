@@ -1,8 +1,8 @@
 # -*- coding: utf-8 -*-
 """
-Created on Mon May 10 14:00:06 2021
+En este archivo se encuentran los códigos para generar los plots de la data
+sin procesar proveniente de los 17 sensores.
 
-@author: Ignacio
 """
 #%% Imports
 import numpy as np
@@ -43,21 +43,24 @@ ConditionsLabels_dict = {
     }    
 }
 #%% 
-def get_classes_idx(condition_name,condition_labels):
+def get_classes_idx(condition_name, condition_labels):
     """
-    
+    Por cada clase perteneciente a la respectiva condición del activo físico,
+    se elige de forma aleatoria un índice del array que contiene los labels y
+    se guarda en un diccionario.
     --------------------------------------------------------------------------
     Parameters
         
     condition_name: {'Cooler condition','Valve condition','Pump leakage',
                     'Accumulator condition','Stable flag'}
-        Name of hydraulic system's condition to be clasified  
+        Name of hydraulic system's condition to be clasified.  
 
     condition_labels: np.array with shape (2205,)
-        Array that contains the class label for each instance        
+        Array that contains the class label for each instance.   
     --------------------------------------------------------------------------
     Returns
-    out:
+    out: dictionary
+        Class indexes stored as {class_name : class_index}.
     """    
     indexes = {}
     #Iter over condition classes
@@ -76,7 +79,6 @@ def get_classes_idx(condition_name,condition_labels):
 def get_MeasureUnit(sensor_name):
     """
     Returns a str with the sensor's measurement unit.
-    
     --------------------------------------------------------------------------
     Parameters
     
@@ -92,7 +94,6 @@ def get_MeasureUnit(sensor_name):
     
     --------------------------------------------------------------------------
     Returns
-    
     out: str
         measurement unit as str.
     
@@ -120,11 +121,10 @@ def get_MeasureUnit(sensor_name):
         if key == sensor_name:
             return measurement_units_dict[sensor_name]
 #%%
-def plt_RawSignals(RawData_dict,condition_name,condition_labels,
-                   fig_sz=(14,9),dpi=200,subplt=(6,3)):
+def plt_RawSignals(RawData_dict, condition_name, condition_labels,
+                   fig_sz=(14,9), dpi=200, subplt=(6,3)):
     """
-    Plots the raw signal for each sensor
-    
+    Plots the raw signal for each sensor, for a certain condition.
     --------------------------------------------------------------------------
     Parameters
     
@@ -134,10 +134,19 @@ def plt_RawSignals(RawData_dict,condition_name,condition_labels,
      
     condition_name: {'Cooler condition','Valve condition','Pump leakage',
                      'Accumulator condition','Stable flag'}
-        Name of hydraulic system's condition to be clasified       
+        Name of hydraulic system's condition to be clasified.       
 
     condition_labels: np.array with shape (2205,)
-        Array that contains the class label for each instance
+        Array that contains the class label for each instance.
+    
+    fig_sz: tuple (heigth,width), default=(14,9)
+        Tuple that contains the heigth and the width for the figure to plot.
+    
+    dpi: int, default=200
+        Number of pixels for the figure to plot.
+    
+    subplt: tuple (number_rows,number_cols), default=(6,3)
+        Number of rows and colums for the subplots in the figure.
     --------------------------------------------------------------------------
     Returns
     out: plots
@@ -171,7 +180,7 @@ def plt_RawSignals(RawData_dict,condition_name,condition_labels,
 def plt_RawSignalsES(RawData_dict, condition_name, condition_labels,
                      fig_sz=(14,9), dpi=200, subplt=(6,3)):
     """
-    Plotea las señales en raw para cada sensor.
+    Plotea las señales en raw para cada sensor, en español.
     --------------------------------------------------------------------------
     Returns
     out: plots
