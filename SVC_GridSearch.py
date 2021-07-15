@@ -105,7 +105,7 @@ def TimeParam_GridSearch(Kernel, win_olap_str, TimeParam_list, condition,
     accs_df['C'] = C
     if save == True:
         head = 'results/accuracies/' + condition + '/' + win_olap_str + '/'
-        tail1 = condition + '_' + 'SVM' + Kernel + 'Params' 
+        tail1 = condition + '_' + 'SVM' + Kernel + 'Params_' 
         tail2 = win_olap_str + '.csv'
         file_path = head + tail1 + tail2
         accs_df.to_csv(file_path)
@@ -115,8 +115,6 @@ def TimeParam_GridSearch(Kernel, win_olap_str, TimeParam_list, condition,
 #%%
 time_windows = [
     'win60_olap0', # 1 per instance 
-    'win20_olap0', # 3 per instance
-    'win18_olap10',# 6 per instance
     ]
 
 TimeParam_list = ['RMS', 'P2P', 'Mean', 'Variance']
@@ -125,7 +123,7 @@ condition = 'valve'
 
 for win_olap_str in time_windows:
     condition_accs = load_SVMconditon_MaxAcc_idxs(win_olap_str, condition)
-    accs_df = TimeParam_GridSearch('rbf', win_olap_str, TimeParam_list,
+    accs_df = TimeParam_GridSearch('linear', win_olap_str, TimeParam_list,
                                    condition, condition_accs, save = True)
 #%%
 conditions_list = [

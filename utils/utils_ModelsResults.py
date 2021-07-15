@@ -7,6 +7,7 @@ import os
 import numpy as np
 import pandas as pd
 import matplotlib.pyplot as plt
+import seaborn as sns
 #%% load_condition_accuracies
 def load_condition_accuracies(cond_accuracies_path):
     """
@@ -219,7 +220,13 @@ def plot_SVM_accuracies(condition_accuracies, TimeParams_list):
     plt.tight_layout()
     plt.show()
 #%%
-#def plot_SVM_HeatMap():
+# def plot_SVM_HeatMap(condition_accs, Kernel, TimeParams_list, win_olap_str,
+#                      fig_sz=(12,10)):
+#     plt.figure(figsize = fig_sz, dpi=120)
+#     for TimeParam, i in zip(TimeParams_list, range(len(TimeParams_list))):
+#         plt.subplot(np.ceil(len(TimeParams_list)/2).astype(int), 2, i+1)
+        
+    
     
     
     
