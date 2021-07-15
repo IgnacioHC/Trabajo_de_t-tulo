@@ -194,14 +194,6 @@ def forward_select(model, TimeParam_df_train, TimeParam_df_test, Y_train,
     sensors_idx_list = [0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16]
     accuracies = []
     good_idxs = []
-    #Iteration 1
-    # if lda == True:
-    #     Model = LinearDiscriminantAnalysis(n_components=1)
-    #     max_acc, max_idxs = get_BestCombination(TimeParam_df, sensors_idx_list,
-    #                                             good_idxs, Model,
-    #                                             condition_labels)
-    # else:
-    #     pass
     max_acc, max_idxs = get_BestCombination(TimeParam_df_train, TimeParam_df_test,
                                             sensors_idx_list , good_idxs,
                                             model, Y_train, Y_test)
@@ -211,13 +203,6 @@ def forward_select(model, TimeParam_df_train, TimeParam_df_test, Y_train,
     sensors_idx_list.remove(max_idxs[0])
     old_good_idxs = good_idxs
     good_idxs.append(max_idxs[0])
-    # if lda == True and model != LinearDiscriminantAnalysis(n_components=1):
-    #     Model = LinearDiscriminantAnalysis(n_components=2)
-    #     max_acc, max_idxs = get_BestCombination(TimeParam_df, sensors_idx_list,
-    #                                             good_idxs, Model,
-    #                                             condition_labels)
-    # else:
-    #     pass
     max_acc, max_idxs = get_BestCombination(TimeParam_df_train, TimeParam_df_test,
                                             sensors_idx_list , good_idxs,
                                             model, Y_train, Y_test)
@@ -520,7 +505,7 @@ def model_fwd_select(models_dict, conditions_labels, TimeParams_df_dict):
         times_DataFrame = pd.DataFrame(times_series, index = idx)
     return accuracies_DataFrame, models_idxs_dict, times_DataFrame
 #%%
-def save_accuracies(models_dict, condition_name, cond_accuracies,win_olap_str):
+def save_accuracies(models_dict, condition_name, cond_accuracies, win_olap_str):
     """
     Saves the accuracies obtained from the function conditions_fwd_select() as
     .csv files.
