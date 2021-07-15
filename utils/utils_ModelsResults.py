@@ -108,10 +108,14 @@ def plot_RF_GiniEntro_accs(condition_accs, TimeParams_list, time_windows,
             accs_gini = condition_accs[win_olap_str]['RF'][TimeParam].to_numpy()
             accs_entro = condition_accs[win_olap_str]['RFentropy'][TimeParam].to_numpy()
             #Plots
+            len_training = get_len_training(win_olap_str)
+            lbl = 'Datos de entrenamiento : {}'.format(len_training)
             plt.plot(N_estimators, accs_gini,
-                     color = windows_colors[win_olap_str], marker = 'o')
+                     color = windows_colors[win_olap_str], marker = 'o',
+                     label = lbl)
             plt.plot(N_estimators, accs_entro,
-                     color = windows_colors[win_olap_str], marker = 's')
+                     color = windows_colors[win_olap_str], marker = 's',
+                     label = lbl)
         plt.title(TimeParam, size = tit_sz )
         plt.xlabel('Cantidad de árboles', size = ax_sz)
         plt.ylabel('Accuracy', size = ax_sz)
@@ -170,10 +174,14 @@ def plot_KNN_UniDist_accs(condition_accs, TimeParams_list, time_windows,
             accs_uni = condition_accs[win_olap_str]['KNN'][TimeParam].to_numpy()
             accs_dist = condition_accs[win_olap_str]['KNNdistance'][TimeParam].to_numpy()
             #Plots
+            len_training = get_len_training(win_olap_str)
+            lbl = 'Datos de entrenamiento : {}'.format(len_training)
             plt.plot(N_neighbors, accs_uni,
-                     color = windows_colors[win_olap_str], marker = 'o')
+                     color = windows_colors[win_olap_str], marker = 'o',
+                     label = lbl)
             plt.plot(N_neighbors, accs_dist,
-                     color = windows_colors[win_olap_str], marker = 's')
+                     color = windows_colors[win_olap_str], marker = 's',
+                     label = lbl)
         plt.title(TimeParam, size = tit_sz )
         plt.xlabel('Cantidad de vecinos', size = ax_sz)
         plt.ylabel('Accuracy', size = ax_sz)
@@ -203,7 +211,7 @@ def plot_SVM_accuracies(condition_accuracies, TimeParams_list):
                 accuracies_df = condition_accuracies[win_olap_str]['SVM']
                 accuracies.append(accuracies_df.iloc[kernel_idx][TimeParam])
                 win_lens.append(get_len_training(win_olap_str))
-            plt.plot(win_lens, accuracies, label = model_SVM_name)
+            plt.scatter(win_lens, accuracies, label = model_SVM_name)
         plt.title(TimeParam, size = 12)
         plt.xlabel('Largo ventana de entreanamiento', size=10)
         plt.ylabel('Accuracy', size=10)
