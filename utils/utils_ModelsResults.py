@@ -20,13 +20,15 @@ fig_width = 10
 #%% load_condition_accuracies
 def load_condition_accuracies(cond_accuracies_path):
     """
-    Carga las accuracies correspondientes a la condicion entregada
+    Carga las accuracies correspondientes a la condicion (clasificasión)
+    entregada, para todas las ventanas de tiempo y todos los parámetros de
+    tiempo.
     --------------------------------------------------------------------------
     Parameters     
 
     cond_accuracies_path: string
-    
-    --------------------------------------------------------------------------
+        cond_accuracies_path = ''results/accuracies/condition/'     
+    -------------------------------------------------------------------------
     Returns
     out: 
     """
@@ -48,8 +50,11 @@ def get_len_PerInst(win_olap_str):
     ciclo de operación.
     --------------------------------------------------------------------------
     Parameters     
-
+    
     win_olap_str: string
+        String with the window and overlap length in seconds
+        example: 'win20_olap0', that means a window length of 20 seconds and
+        an overlap length of 0 seconds.
     --------------------------------------------------------------------------
     Returns
     out: 
@@ -62,6 +67,38 @@ def plot_RF_GiniEntro_accs(condition, TimeParams_list, fig_sz = (fig_width,12),
                           subplt_tit_sz = 12, subplt_XYlabel_sz = 10,
                           shareY = True, legend_loc = (1.3, 0.6)):
     """
+    --------------------------------------------------------------------------
+    Parameters
+    
+    condition: str
+        condition name.
+    
+    TimeParams_list: list
+        List containing the names of the time parameter to be ploted.
+        example: ['RMS', 'Mean']
+    
+    win_olap_str: string
+        String with the window and overlap length in seconds
+        example: 'win20_olap0', that means a window length of 20 seconds and
+        an overlap length of 0 seconds.
+    
+    fig_sz: tuple, default = ()
+        Figure's size.
+    
+    subplt_tit_sz: float or int, deafult =
+        Subplot title font title size.
+    
+    subplt_XYlabel_sz: float or int, deafult =
+        Subplot xlabel and ylabel font size.
+    
+    shareY: bool, default = True
+        If true, subplots share the Y axis scale.
+    
+    legend_loc: (float, float), default = ()
+        Location for the figure legend.
+    --------------------------------------------------------------------------
+    Returns
+    out: plots
     """
     time_windows_colors = {
         'win60_olap0' : '#2b20bd',  
@@ -108,6 +145,38 @@ def plot_KNN_UniDist_accs(condition, TimeParams_list, fig_sz = (fig_width,12),
                           subplt_tit_sz = 12, subplt_XYlabel_sz = 10,
                           shareY = True, legend_loc = (1.3, 0.6)):
     """
+    --------------------------------------------------------------------------
+    Parameters
+    
+    condition: str
+        condition name.
+    
+    TimeParams_list: list
+        List containing the names of the time parameter to be ploted.
+        example: ['RMS', 'Mean']
+    
+    win_olap_str: string
+        String with the window and overlap length in seconds
+        example: 'win20_olap0', that means a window length of 20 seconds and
+        an overlap length of 0 seconds.
+    
+    fig_sz: tuple, default = ()
+        Figure's size.
+    
+    subplt_tit_sz: float or int, deafult =
+        Subplot title font title size.
+    
+    subplt_XYlabel_sz: float or int, deafult =
+        Subplot xlabel and ylabel font size.
+    
+    shareY: bool, default = True
+        If true, subplots share the Y axis scale.
+    
+    legend_loc: (float, float), default = ()
+        Location for the figure legend.
+    --------------------------------------------------------------------------
+    Returns
+    out: plots
     """
     time_windows_colors = {
         'win60_olap0' : '#2b20bd',  
@@ -144,8 +213,7 @@ def plot_KNN_UniDist_accs(condition, TimeParams_list, fig_sz = (fig_width,12),
             'Peso uniforme,\n4 datos por ciclo',
             'Peso basado en la distancia,\n4 datos por ciclo',
             'Peso uniforme,\n7 datos por ciclo',
-            'Peso basado en la distancia,\n7 datos por ciclo']
-
+            'Peso basado en la distancia,\n7 datos por ciclo']    
     fig.legend(curves, labels = lbls, bbox_to_anchor = legend_loc, ncol = 1,
                fancybox=True, fontsize = 'medium')
     plt.tight_layout()
@@ -156,10 +224,29 @@ def plot_SVM_accuracies(condition, TimeParams_list, fig_sz = (fig_width,8),
                         subplt_XYlabel_sz  = 10, legend_loc = 'upper right'):
     """
     --------------------------------------------------------------------------
-    Parameters     
+    Parameters
+    
+    condition: str
+        condition name.
+    
+    TimeParams_list: list
+        List containing the names of the time parameter to be ploted.
+        example: ['RMS', 'Mean']
+    
+    fig_sz: tuple, default = ()
+        Figure's size.
+    
+    subplt_tit_sz: float or int, deafult =
+        Subplot title font title size.
+    
+    subplt_XYlabel_sz: float or int, deafult =
+        Subplot xlabel and ylabel font size.
+    
+    legend_loc: (float, float), default = ()
+        Location for the figure legend.
     --------------------------------------------------------------------------
     Returns
-    out: 
+    out: plots
     """
     time_windows = [
     'win60_olap0',  
@@ -268,7 +355,7 @@ def plot_SVM_Heatmap(condition, Kernel, TimeParams_list, win_olap_str,
     tit_upper = 'Accuracies obtenidas de la clasifación: {},'.format(condicion)
     n_PerInst = get_len_PerInst(win_olap_str)
     tit_lower = '\n usando {} dato(s) por ciclo'.format(n_PerInst)
-    suptitle = tit_upper + tit_lower
+    suptitle = tit_upper + tit_lower + 'y un kernel ' + Kernel
     fig.suptitle(suptitle, size = tit_sz)
     for TimeParam, ax in zip(TimeParams_list, fig.axes):
         TimeParam_df = data[['gamma', 'C', TimeParam]]
@@ -345,7 +432,7 @@ def plot_SVM_Heatmap2(condition, Kernel, TimeParams_list, win_olap_str,
     tit_upper = 'Accuracies obtenidas de la clasifación: {},'.format(condicion)
     n_PerInst = get_len_PerInst(win_olap_str)
     tit_lower = '\n usando {} dato(s) por ciclo'.format(n_PerInst)
-    suptitle = tit_upper + tit_lower
+    suptitle = tit_upper + tit_lower + 'y kernel ' + Kernel
     fig.suptitle(suptitle, size = tit_sz)
     # Iter over time params
     for i, ax in zip(range(len((TimeParams_list))), fig.axes):

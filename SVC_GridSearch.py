@@ -116,9 +116,8 @@ def TimeParam_GridSearch(Kernel, win_olap_str, TimeParam_list, condition,
     return accs_df
 #%%
 conditions_list = [
-    'valve',
-    'pump',
-    'accumulator'
+    'cooler',
+    'stableFlag'
     ]
 
 time_windows = [
@@ -135,17 +134,14 @@ TimeParam_list = ['RMS', 'P2P', 'Mean', 'Variance']
 param_grid = {'C': [10, 100, 1000, 10**4, 10**5, 10**6, 10**7],
               'gamma': [0.1, 1, 10, 100]}
 
-conditions_list = [
-    'valve'
-    ]
 
 
 for condition in conditions_list:
     print('======', condition, '======')
     MaxAcc_idxs = load_SVMconditon_MaxAcc_idxs('win60_olap0', condition)
-    accs_df = TimeParam_GridSearch('linear', 'win60_olap0', TimeParam_list,
-                                       condition, MaxAcc_idxs, param_grid,
-                                       save = True)
+    accs_df = TimeParam_GridSearch('rbf', 'win60_olap0', TimeParam_list,
+                                   condition, MaxAcc_idxs, param_grid,
+                                   save = True)
 
 
 
