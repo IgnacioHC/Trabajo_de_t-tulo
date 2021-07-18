@@ -48,12 +48,12 @@ def load_SVMconditon_MaxAcc_idxs(win_olap_str, condition):
     data = json.load(open(file_path,))
     return data[condition]
 #%% get_sets
-def get_sets(win_olap_str, TimeParam, condition, Kernel, condition_accs):
+def get_sets(win_olap_str, TimeParam, condition, Kernel, MaxAcc_idxs):
     win = int(win_olap_str.split('_')[0][3:])
     olap = int(win_olap_str.split('_')[0][4:])
     sets = preprocess_data(Raw_data, conditions[condition], TimeParam,
                            win, olap)
-    TimeParam_Ker_AccIdxs = condition_accs['SVM ' + Kernel][TimeParam]
+    TimeParam_Ker_AccIdxs = MaxAcc_idxs['SVM ' + Kernel][TimeParam]
     sensor_names = ['Temperature sensor 1', #0
                     'Temperature sensor 2', #1
                     'Temperature sensor 3', #2
@@ -76,13 +76,12 @@ def get_sets(win_olap_str, TimeParam, condition, Kernel, condition_accs):
     X_train, X_test = sets[0][sensor_list].values, sets[1][sensor_list].values
     Y_train, Y_test = sets[2], sets[3]
     return X_train, X_test, Y_train, Y_test
-#%% GRID SEARCH
-def GridSearch(Kernel, win_olap_str, TimeParam, condition, condition_acss):
-    param_grid = {'C': [1, 10, 100, 1000, 10000, 100000],
-                  'gamma': [0.1, 0.2, 0.4, 0.8, 1.6, 3.2, 6.4,12.8]}
+#%% GridSearc
+def GridSearch(Kernel, win_olap_str, TimeParam, condition, MaxAcc_idxs,
+               param_grid):
     X_train, X_test, Y_train, Y_test = get_sets(win_olap_str, TimeParam,
                                                 condition, Kernel,
-                                                condition_acss)
+                                                MaxAcc_idxs)
     TimeParam_accs = []
     for c in param_grid['C']:
         for Gamma in param_grid['gamma']:
@@ -90,17 +89,20 @@ def GridSearch(Kernel, win_olap_str, TimeParam, condition, condition_acss):
             acc = accuracy_score(Y_test, model.predict(X_test))
             TimeParam_accs.append(acc)
     return TimeParam_accs
-#%%
+#%% TimeParam_GridSearch
 def TimeParam_GridSearch(Kernel, win_olap_str, TimeParam_list, condition,
-                         condition_accs, save = False):
+                         MaxAcc_idxs, param_grid, save = False):
     accuracies_dict = {}
     for TimeParam in TimeParam_list:
+        print(TimeParam)
         TimeParam_accs = GridSearch(Kernel, win_olap_str, TimeParam, condition,
-                                    condition_accs)
+                                    MaxAcc_idxs, param_grid)
         accuracies_dict[TimeParam] = TimeParam_accs
     accs_df = pd.DataFrame.from_dict(accuracies_dict)
-    gamma = [0.1, 0.2, 0.4, 0.8, 1.6, 3.2, 6.4,12.8]*6
-    C = [1]*8 + [10]*8 + [100]*8 + [1000]*8 + [10000]*8 + [100000]*8
+    gamma = param_grid['gamma']*len(param_grid['C'])
+    C = []
+    for c in param_grid['C']:
+        C = C + [c]*len(param_grid['gamma'])
     accs_df['gamma'] = gamma
     accs_df['C'] = C
     if save == True:
@@ -113,25 +115,10 @@ def TimeParam_GridSearch(Kernel, win_olap_str, TimeParam_list, condition,
         pass
     return accs_df
 #%%
-time_windows = [
-    'win60_olap0', # 1 per instance 
-    ]
-
-TimeParam_list = ['RMS', 'P2P', 'Mean', 'Variance']
-
-condition = 'valve'
-
-for win_olap_str in time_windows:
-    condition_accs = load_SVMconditon_MaxAcc_idxs(win_olap_str, condition)
-    accs_df = TimeParam_GridSearch('linear', win_olap_str, TimeParam_list,
-                                   condition, condition_accs, save = True)
-#%%
 conditions_list = [
-    'cooler',
     'valve',
     'pump',
-    'accumulator',
-    'StableFlag'
+    'accumulator'
     ]
 
 time_windows = [
@@ -141,16 +128,48 @@ time_windows = [
     'win22_olap10',# 4 per instance
     'win20_olap10',# 5 per instance
     'win18_olap10',# 6 per instance
-    'win15_olap8',# 7 per instance
     ]
 
 TimeParam_list = ['RMS', 'P2P', 'Mean', 'Variance']
 
+param_grid = {'C': [10, 100, 1000, 10**4, 10**5, 10**6, 10**7],
+              'gamma': [0.1, 1, 10, 100]}
+
+conditions_list = [
+    'valve'
+    ]
+
+
 for condition in conditions_list:
-    for win_olap_str in time_windows:
-        condition_accs = load_SVMconditon_MaxAcc_idxs(win_olap_str, condition)
-        for Kernel in ['rbf', 'linear', 'sigmoid']:
-            accs_df = TimeParam_GridSearch(Kernel, win_olap_str,
-                                           TimeParam_list, condition,
-                                           condition_accs, save = True)
-#%%
+    print('======', condition, '======')
+    MaxAcc_idxs = load_SVMconditon_MaxAcc_idxs('win60_olap0', condition)
+    accs_df = TimeParam_GridSearch('linear', 'win60_olap0', TimeParam_list,
+                                       condition, MaxAcc_idxs, param_grid,
+                                       save = True)
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+    
+    
+
+
+#%%%
+# for condition in conditions_list:
+#     for win_olap_str in time_windows:
+#         condition_accs = load_SVMconditon_MaxAcc_idxs(win_olap_str, condition)
+#         for Kernel in ['rbf', 'linear', 'sigmoid']:
+#             accs_df = TimeParam_GridSearch(Kernel, win_olap_str,
+#                                            TimeParam_list, condition,
+#                                            condition_accs, save = True)
+
