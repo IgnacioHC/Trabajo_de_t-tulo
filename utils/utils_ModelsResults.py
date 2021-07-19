@@ -355,7 +355,7 @@ def plot_SVM_Heatmap(condition, Kernel, TimeParams_list, win_olap_str,
     tit_upper = 'Accuracies obtenidas de la clasifación: {},'.format(condicion)
     n_PerInst = get_len_PerInst(win_olap_str)
     tit_lower = '\n usando {} dato(s) por ciclo'.format(n_PerInst)
-    suptitle = tit_upper + tit_lower + 'y un kernel ' + Kernel
+    suptitle = tit_upper + tit_lower + ' y un kernel ' + Kernel
     fig.suptitle(suptitle, size = tit_sz)
     for TimeParam, ax in zip(TimeParams_list, fig.axes):
         TimeParam_df = data[['gamma', 'C', TimeParam]]
@@ -445,6 +445,66 @@ def plot_SVM_Heatmap2(condition, Kernel, TimeParams_list, win_olap_str,
                          cbar_kws={"orientation": cbar_orient},
                          cbar=i == 0, cbar_ax=None if i else cbar_ax) 
         hm.set_title(TimeParms_ES[TimeParam], size = subplt_tit_sz )
+#%%
+def plot_LDA_accuracies(condition, TimeParams_list, fig_sz = (fig_width,8),
+                        shareY = True, subplt_tit_sz = 12,
+                        subplt_XYlabel_sz  = 10, legend_loc = 'upper right'):
+    """
+    --------------------------------------------------------------------------
+    Parameters
+    
+    condition: str
+        condition name.
+    
+    TimeParams_list: list
+        List containing the names of the time parameter to be ploted.
+        example: ['RMS', 'Mean']
+    
+    fig_sz: tuple, default = ()
+        Figure's size.
+    
+    subplt_tit_sz: float or int, deafult =
+        Subplot title font title size.
+    
+    subplt_XYlabel_sz: float or int, deafult =
+        Subplot xlabel and ylabel font size.
+    
+    legend_loc: (float, float), default = ()
+        Location for the figure legend.
+    --------------------------------------------------------------------------
+    Returns
+    out: plots
+    """
+    time_windows = [
+    'win60_olap0',  
+    'win30_olap0',
+    'win20_olap0',
+    'win22_olap10',
+    'win20_olap10',# 5 per instance
+    'win18_olap10',# 6 per instance
+    'win15_olap8',
+    ]  
+    path = 'results/accuracies/' + condition + '/'
+    condition_accuracies = load_condition_accuracies(path)
+    cols, rows = 2, np.ceil(len(TimeParams_list)/2).astype(int)
+    fig, axs = plt.subplots(rows, cols, figsize = fig_sz, dpi = 100,
+                            sharey = shareY)
+    # Iter over conditions
+    for TimeParam, ax in zip(TimeParams_list, fig.axes):
+        # Iter over trees
+        accuracies = []
+        lens_PerInst = [] 
+        for win_olap_str in time_windows:
+            accuracies_df = condition_accuracies[win_olap_str]['LDA']
+            accuracies.append(accuracies_df.iloc[0][TimeParam])
+            lens_PerInst.append(get_len_PerInst(win_olap_str))
+        ax.plot(lens_PerInst, accuracies, marker = 'o')
+        # Subplot text
+        ax.set_title(TimeParms_ES[TimeParam], size = subplt_tit_sz )
+        ax.set_xlabel('Datos por ciclo', size = subplt_XYlabel_sz)
+        ax.set_ylabel('Accuracy', size = subplt_XYlabel_sz)
+    plt.tight_layout()
+    plt.show()
 #%%
 def get_len_training(win_olap_str, train_sz = 0.7):
     """

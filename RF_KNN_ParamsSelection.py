@@ -4,13 +4,11 @@
 """
 #%% IMPORTS
 import json
-
 import numpy as np
 import pandas as pd
 
 from sklearn.ensemble import RandomForestClassifier
 from sklearn.neighbors import KNeighborsClassifier
-from sklearn.discriminant_analysis import LinearDiscriminantAnalysis
 from sklearn.metrics import accuracy_score
 
 from utils.utils_preprocessing import preprocess_data
@@ -170,25 +168,25 @@ def get_accs_df(win_olap_str, condition, conditions_dict, model_name,
         pass
     return accs_df 
 #%%
-time_windows = [
-    'win60_olap0', # 1 per instance 
-    'win30_olap0', # 2 per instance
-    'win20_olap0', # 3 per instance
-    'win22_olap10',# 4 per instance
-    'win20_olap10',# 5 per instance
-    'win18_olap10',# 6 per instance
-    'win15_olap8',# 7 per instance
-    ]
+# time_windows = [
+#     'win60_olap0', # 1 per instance 
+#     'win30_olap0', # 2 per instance
+#     'win20_olap0', # 3 per instance
+#     'win22_olap10',# 4 per instance
+#     'win20_olap10',# 5 per instance
+#     'win18_olap10',# 6 per instance
+#     'win15_olap8',# 7 per instance
+#     ]
 
-models = [
-    'RFentropy',
-    'KNNdistance'
-    ]
+# models = [
+#     'RFentropy',
+#     'KNNdistance'
+#     ]
 
-for model_name in models:
-    for condition in conditions.keys():
-        for win_olap_str in time_windows:
-            accs_df = get_accs_df(win_olap_str, condition, model_name,
-                                  save = True)
-#%% 
+# for model_name in models:
+#     for condition in conditions.keys():
+#         for win_olap_str in time_windows:
+#             accs_df = get_accs_df(win_olap_str, condition, model_name,
+#                                   save = True)
+#
 

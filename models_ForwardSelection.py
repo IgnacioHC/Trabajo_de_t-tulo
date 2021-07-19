@@ -8,6 +8,7 @@ from sklearn.ensemble import RandomForestClassifier
 from sklearn.neighbors import KNeighborsClassifier
 from sklearn.discriminant_analysis import LinearDiscriminantAnalysis
 from sklearn.svm import SVC
+from sklearn.neural_network import MLPClassifier
 
 from utils.utils_ForwardSelect import conditions_fwd_select
 #%% LOAD DATA
@@ -67,6 +68,25 @@ SVM_models = {
 
 LDA_models = {'LDA 1' : LinearDiscriminantAnalysis(n_components=1)}
 
+NN_models = {
+    'NN relu' : MLPClassifier(hidden_layer_sizes = (20, 20, 20, 20, 20),
+                              activation = 'relu',
+                              learning_rate = 'constant',
+                              early_stopping = True, 
+                              n_iter_no_change = 200, max_iter = 1000),
+    
+    'NN logistic' : MLPClassifier(hidden_layer_sizes = (20, 20, 20, 20, 20),
+                                  activation = 'logistic',
+                                  learning_rate = 'constant',
+                                  early_stopping = True, 
+                                  n_iter_no_change = 200, max_iter = 1000),
+    
+    'NN tanh' : MLPClassifier(hidden_layer_sizes = (20, 20, 20, 20, 20),
+                              activation = 'tanh', learning_rate = 'constant',
+                              early_stopping = True, n_iter_no_change = 200,
+                              max_iter = 1000),
+    }
+
 TimeParams_list = [
     'RMS',
     'P2P',
@@ -84,22 +104,27 @@ time_windows_params = [
     'win15_olap8',# 7 per instance
     ]
 #%% RUN MODELS
+conditions_dict = {'valve' : conditions['valve']}
 
-_ = conditions_fwd_select(Raw_data, conditions, LDA_models, TimeParams_list,
-                          'win15_olap8', save = False)
+
+for win_olap_str in time_windows_params:
+    results = conditions_fwd_select(Raw_data, conditions_dict, NN_models,
+                                    TimeParams_list, win_olap_str,
+                                    save = True)
+
 #%%
-for win_olap_str in time_windows_params:
-    _ = conditions_fwd_select(Raw_data, conditions, KNN_models, TimeParams_list,
-                              win_olap_str)
+# for win_olap_str in time_windows_params:
+#     _ = conditions_fwd_select(Raw_data, conditions, KNN_models, TimeParams_list,
+#                               win_olap_str)
 
-for win_olap_str in time_windows_params:
-    _ = conditions_fwd_select(Raw_data, conditions, RF_models, TimeParams_list,
-                              win_olap_str)
+# for win_olap_str in time_windows_params:
+#     _ = conditions_fwd_select(Raw_data, conditions, RF_models, TimeParams_list,
+#                               win_olap_str)
 
-for win_olap_str in time_windows_params:
-    _ = conditions_fwd_select(Raw_data, conditions, SVM_models, TimeParams_list,
-                              win_olap_str)
+# for win_olap_str in time_windows_params:
+#     _ = conditions_fwd_select(Raw_data, conditions, SVM_models, TimeParams_list,
+#                               win_olap_str)
 
-for win_olap_str in time_windows_params:
-    _ = conditions_fwd_select(Raw_data, conditions, LDA_models, TimeParams_list,
-                              win_olap_str)
+# for win_olap_str in time_windows_params:
+#     _ = conditions_fwd_select(Raw_data, conditions, LDA_models, TimeParams_list,
+#                               win_olap_str)
