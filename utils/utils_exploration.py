@@ -178,7 +178,9 @@ def plt_RawSignals(RawData_dict, condition_name, condition_labels,
     plt.show()
 #%%
 def plt_RawSignalsES(RawData_dict, condition_name, condition_labels,
-                     fig_sz=(14,9), dpi=200, subplt=(6,3)):
+                     fig_sz=(10,13.5), dpi=200, subplt=(6,3), tit_sz = 15, 
+                     subplt_tit_sz = 12, subplt_XYlabel_sz = 12,
+                     save_fig = False, tail = '.png', bbox = (0.75, 0.9)):
     """
     Plotea las señales en raw para cada sensor, en español.
     --------------------------------------------------------------------------
@@ -229,8 +231,8 @@ def plt_RawSignalsES(RawData_dict, condition_name, condition_labels,
           'Cooling efficiency' : 'Eficiencia [%]',
           'Cooling power' : 'Potencia [kW]',
           'Efficiency factor' : 'Eficiencia [%]',
-          'Flow sensor 1' : 'Flujo de agua [L/min]',
-          'Flow sensor 2' : 'Flujo de agua [L/min]',
+          'Flow sensor 1' : 'Flujo [L/min]',
+          'Flow sensor 2' : 'Flujo [L/min]',
           'Pressure sensor 1' : 'Presión [bar]',
           'Pressure sensor 2' : 'Presión [bar]',
           'Pressure sensor 3' : 'Presión [bar]',
@@ -248,8 +250,8 @@ def plt_RawSignalsES(RawData_dict, condition_name, condition_labels,
           'Cooling efficiency' : 'Eficiencia del enfriador',
           'Cooling power' : 'Potencia del enfriador',
           'Efficiency factor' : 'Factor de eficiencia',
-          'Flow sensor 1' : 'Sensor de lujo de agua',
-          'Flow sensor 2' : 'Sensor de flujo de agua',
+          'Flow sensor 1' : 'Sensor de flujo 1',
+          'Flow sensor 2' : 'Sensor de flujo 2',
           'Pressure sensor 1' : 'Sensor de presión 1',
           'Pressure sensor 2' : 'Sensor de presión 2',
           'Pressure sensor 3' : 'Sensor de presión 3',
@@ -259,7 +261,9 @@ def plt_RawSignalsES(RawData_dict, condition_name, condition_labels,
           'Motor power' : 'Potencia del motor'
           }
     
-    plt.figure(figsize=fig_sz , dpi=dpi)  
+    fig = plt.figure(figsize=fig_sz , dpi=dpi)
+    suptitle = 'Datos sin procesar de ' + condiciones[condition_name]
+    fig.suptitle(suptitle + '\n'+'\n'+'\n', size = tit_sz)
     #Get random indxs for each class
     indexes = get_classes_idx(condition_name,condition_labels)
     #Subplots
@@ -273,17 +277,27 @@ def plt_RawSignalsES(RawData_dict, condition_name, condition_labels,
         i = list(RawData_dict).index(sensor_name) + 1
         m, n = subplt
         plt.subplot(m, n, i)
-        #Iter over classes        
+        #Iter over classes
+        Labels = []
         for class_name , class_idx in indexes.items():
-            plt.plot(t, sensor_data[class_idx,:],
-                     label = Nombres_clases[condition_name][class_name])
+            plt.plot(t, sensor_data[class_idx,:])
+            Labels.append(Nombres_clases[condition_name][class_name])
         #FigText
-        head_title = 'Señal sin procesar de ' + condiciones[condition_name]
-        tail_title = '\n{}'.format(Nombre_sensores[sensor_name])
-        title = head_title + tail_title
-        plt.title(title,size=12)
-        plt.xlabel('Tiempo [segundos]',size=11)
-        plt.ylabel(Unidades_de_medida[sensor_name ], size=11)
-        plt.legend()      
+        plt.title(Nombre_sensores[sensor_name], size = subplt_tit_sz )
+        plt.xlabel('Tiempo [segundos]', size = subplt_XYlabel_sz)
+        plt.ylabel(Unidades_de_medida[sensor_name ], size = subplt_XYlabel_sz)
+    
+    if len(indexes) == 3:
+        Ncol = 3
+    else:
+        Ncol = 2
+    #bbox_to_anchor = (x, y, width, height)
+    fig.legend(labels = Labels, ncol = Ncol, fancybox=True, fontsize = 'large',
+               bbox_to_anchor = bbox)
     plt.tight_layout()
+    if save_fig == True:
+        head = 'images/RawData/RawData_' + condition_name.split(' ')[0]
+        plt.savefig(head + tail)
+    else:
+        pass
     plt.show()

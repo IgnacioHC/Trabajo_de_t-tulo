@@ -12,6 +12,8 @@ import matplotlib.pyplot as plt
 
 from sklearn.preprocessing import MinMaxScaler
 from sklearn.model_selection import train_test_split
+
+from utils.utils_ModelsResults import get_len_PerInst
 #%%
 def to_TimeParam(Xt, time_param, t_win = 20, t_olap = 0):
     """
@@ -355,7 +357,9 @@ def preprocess_data(RawData_dict, condition_labels, time_param, t_win, t_olap,
     return TimeParam_df_train, TimeParam_df_test, Y_train, Y_test
 #%%
 def plot_TimeParamES(TimeParam_dict, condition_name, condition_labels, 
-                     time_param, fig_sz=(20,18)):   
+                     time_param, win_olap_str, fig_sz=(10,9), tit_sz = 15,
+                     dpi = 200, subplt_tit_sz = 12, subplt_XYlabel_sz = 12,
+                     save_fig = False, tail_path2 ='.png'):   
     """
     Misma función que plot_TimeParam, pero plotea en español.
     """
@@ -404,7 +408,7 @@ def plot_TimeParamES(TimeParam_dict, condition_name, condition_labels,
           'Cooling efficiency' : 'Eficiencia del enfriador',
           'Cooling power' : 'Potencia del enfriador',
           'Efficiency factor' : 'Factor de eficiencia',
-          'Flow sensor 1' : 'Sensor de lujo de agua',
+          'Flow sensor 1' : 'Sensor de flujo de agua',
           'Flow sensor 2' : 'Sensor de flujo de agua',
           'Pressure sensor 1' : 'Sensor de presión 1',
           'Pressure sensor 2' : 'Sensor de presión 2',
@@ -423,30 +427,44 @@ def plot_TimeParamES(TimeParam_dict, condition_name, condition_labels,
         }    
 
     #Figure settings
-    plt.figure(figsize=fig_sz , dpi=200)
+    fig = plt.figure(figsize=fig_sz , dpi=dpi)
+    n_PerInst = get_len_PerInst(win_olap_str)
+    title_up = time_param  + ' para la clasificación: '
+    title_low = '\nusando {} dato(s) por ciclo'.format(n_PerInst)
+    suptitle = title_up + condiciones[condition_name] + ',' + title_low 
+    fig.suptitle(suptitle+ '\n'+'\n'+'\n', size = tit_sz, ha = 'center')
     #Iterate over sensors
     for sensor_name in list(TimeParam_dict):
         #Subplot position
         i = list(TimeParam_dict).index(sensor_name) + 1
-        plt.subplot(np.ceil(len(list(TimeParam_dict))/3).astype(int), 3,i)
+        rows = np.ceil(len(list(TimeParam_dict))/3).astype(int)
+        plt.subplot(rows, 3,i)
         #Iterate over condition classes
         classes_dict = split_classes(sensor_data = TimeParam_dict[sensor_name],
                                      condition_name = condition_name,
-                                     condition_labels = condition_labels)      
+                                     condition_labels = condition_labels)
+        Labels = []
         for class_name , class_TimeParam_data in classes_dict.items():
             stop = class_TimeParam_data.shape[0]
             x = np.linspace(1, stop,stop)
-            plt.scatter(x, class_TimeParam_data,
-                        label = Nombres_clases[condition_name][class_name])
+            plt.scatter(x, class_TimeParam_data)
+            Labels.append(Nombres_clases[condition_name][class_name])
         #FigText
-        upper_tit1 = Parametros_tiempo[time_param] + ' obtenida de: '
-        upper_tit2 = Nombre_sensores[sensor_name]
-        lower_tit = '\n Clasificasión: ' + condiciones[condition_name]
-        title = upper_tit1 + upper_tit2 + lower_tit
-        plt.title(title, size=10)
-        plt.xlabel('Número de ventana temporal', size = 8)
-        plt.ylabel(Parametros_tiempo[time_param], size = 8)    
-        #Legend
-        plt.legend()
+        plt.title(Nombre_sensores[sensor_name], size = subplt_tit_sz)
+        plt.xlabel('Número de ventana temporal', size = subplt_XYlabel_sz)
+        plt.ylabel(Parametros_tiempo[time_param], size = subplt_XYlabel_sz)    
+    #Legend
+    if len(classes_dict) == 3:
+        Ncol = 3
+    else:
+        Ncol = 2
+    fig.legend(labels = Labels, bbox_to_anchor = (0.9, 0.9), ncol = Ncol,
+               fancybox=True, fontsize = 'large')
     plt.tight_layout()
+    if save_fig == True:
+        head_path = 'images/TimeParams/' + time_param + '_'
+        tail_path1 = condition_name.split(' ')[0] + '_' + win_olap_str
+        plt.savefig(head_path + tail_path1 + tail_path2)
+    else:
+        pass
     plt.show()

@@ -69,22 +69,17 @@ SVM_models = {
 LDA_models = {'LDA 1' : LinearDiscriminantAnalysis(n_components=1)}
 
 NN_models = {
-    'NN relu' : MLPClassifier(hidden_layer_sizes = (20, 20, 20, 20, 20),
-                              activation = 'relu',
-                              learning_rate = 'constant',
-                              early_stopping = True, 
-                              n_iter_no_change = 200, max_iter = 1000),
-    
-    'NN logistic' : MLPClassifier(hidden_layer_sizes = (20, 20, 20, 20, 20),
-                                  activation = 'logistic',
-                                  learning_rate = 'constant',
-                                  early_stopping = True, 
-                                  n_iter_no_change = 200, max_iter = 1000),
-    
     'NN tanh' : MLPClassifier(hidden_layer_sizes = (20, 20, 20, 20, 20),
                               activation = 'tanh', learning_rate = 'constant',
-                              early_stopping = True, n_iter_no_change = 200,
-                              max_iter = 1000),
+                              early_stopping = True, max_iter = 1200),
+    
+    'NN relu' : MLPClassifier(hidden_layer_sizes = (20, 20, 20, 20, 20),
+                              activation = 'relu', learning_rate = 'constant',
+                              early_stopping = True, max_iter = 1200),
+    
+    'NN logistic' : MLPClassifier(hidden_layer_sizes = (20, 20, 20, 20, 20),
+                              activation = 'logistic', learning_rate = 'constant',
+                              early_stopping = True, max_iter = 1200)
     }
 
 TimeParams_list = [
@@ -104,7 +99,8 @@ time_windows_params = [
     'win15_olap8',# 7 per instance
     ]
 #%% RUN MODELS
-conditions_dict = {'valve' : conditions['valve']}
+conditions_dict = {'stableFlag' : conditions['stableFlag'],
+                   'accumulator' : conditions['accumulator']}
 
 
 for win_olap_str in time_windows_params:

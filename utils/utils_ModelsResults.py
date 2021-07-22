@@ -27,7 +27,7 @@ def load_condition_accuracies(cond_accuracies_path):
     Parameters     
 
     cond_accuracies_path: string
-        cond_accuracies_path = ''results/accuracies/condition/'     
+        cond_accuracies_path = results/accuracies/condition/'     
     -------------------------------------------------------------------------
     Returns
     out: 
@@ -64,8 +64,9 @@ def get_len_PerInst(win_olap_str):
     return int(np.floor((60-olap)/(win-olap)))
 #%%
 def plot_RF_GiniEntro_accs(condition, TimeParams_list, fig_sz = (fig_width,12), 
-                          subplt_tit_sz = 12, subplt_XYlabel_sz = 10,
-                          shareY = True, legend_loc = (1.3, 0.6)):
+                          n_cols = 2, tit_sz = 15, subplt_tit_sz = 12,
+                          subplt_XYlabel_sz = 12, shareY = True,
+                          legend_loc = (0.925, 0.9), save_fig = False):
     """
     --------------------------------------------------------------------------
     Parameters
@@ -101,28 +102,37 @@ def plot_RF_GiniEntro_accs(condition, TimeParams_list, fig_sz = (fig_width,12),
     out: plots
     """
     time_windows_colors = {
-        'win60_olap0' : '#2b20bd',  
+        'win60_olap0' : '#3addf2',  
         'win30_olap0' : '#0acf1b',  
         'win22_olap10' : '#b12fbd',
         'win15_olap8' : '#c9783e',
         }
+    condiciones = {
+        'cooler' : 'Estado del enfriador',
+        'valve' : 'Estado de la válvula',
+        'pump' : 'Fuga en la bomba',
+        'accumulator' : 'Estado del acumulador',
+        'stableFlag' : 'Estabilidad del sistema'
+        }    
     path = 'results/accuracies/' + condition + '/'
     condition_accs = load_condition_accuracies(path)
     N_estimators = np.array([40, 60, 80, 100, 120])
-    cols, rows = 2, np.ceil(len(TimeParams_list)/2).astype(int)
-    fig, axs = plt.subplots(rows, cols, figsize = fig_sz, dpi = 100,
+    n_rows = np.ceil(len(TimeParams_list)/n_cols).astype(int)
+    fig, axs = plt.subplots(n_rows, n_cols, figsize = fig_sz, dpi = 100,
                             sharey = shareY)
-    #fig.suptitle('Accuracies')
+    suptitle1 = 'Accuracies a partir del modelo RF, clasifiación: '
+    suptitle2 = condiciones[condition] + '\n'+'\n'+'\n'+'\n'+'\n'
+    fig.suptitle(suptitle1 + suptitle2, size = tit_sz)
     for TimeParam, ax in zip(TimeParams_list, fig.axes):
         curves = []
         for win_olap_str in time_windows_colors.keys():
             accs_gini = condition_accs[win_olap_str]['RF'][TimeParam].to_numpy()
             accs_entro = condition_accs[win_olap_str]['RFentropy'][TimeParam].to_numpy()
             #Plots
-            curv1 = ax.plot(N_estimators, accs_gini, marker = 'o',
-                            color = time_windows_colors[win_olap_str])
-            curv2 = ax.plot(N_estimators, accs_entro, marker = 's',
-                            color = time_windows_colors[win_olap_str])
+            curv1 = ax.plot(N_estimators, accs_gini, marker = 'o', mec = 'k',
+                            ms = 6.5, color = time_windows_colors[win_olap_str])
+            curv2 = ax.plot(N_estimators, accs_entro, marker = 's', mec = 'k',
+                            ms = 6.5, color = time_windows_colors[win_olap_str])
             curves = curves + [curv1 + curv2]
             #Subplot Text
             ax.set_title(TimeParms_ES[TimeParam], size = subplt_tit_sz )
@@ -136,14 +146,23 @@ def plot_RF_GiniEntro_accs(condition, TimeParams_list, fig_sz = (fig_width,12),
             'Criterio de entropía,\n4 datos por ciclo',
             'Criterio gini,\n7 datos por ciclo',
             'Criterio de entropía,\n7 datos por ciclo']
-    fig.legend(curves, labels = lbls, bbox_to_anchor = legend_loc, ncol = 1,
+    fig.legend(curves, labels = lbls, bbox_to_anchor = legend_loc, ncol = 4,
                fancybox=True, fontsize = 'medium')
     plt.tight_layout()
+    if save_fig == True:
+        if 'Variance' in TimeParams_list:
+            path = 'images/RF/' + condition + '_RF_Variance'
+        else:
+            path = 'images/RF/' + condition + '_RF_NoVariance'
+        plt.savefig(path)
+    else:
+        pass
     plt.show()
 #%%
 def plot_KNN_UniDist_accs(condition, TimeParams_list, fig_sz = (fig_width,12), 
-                          subplt_tit_sz = 12, subplt_XYlabel_sz = 10,
-                          shareY = True, legend_loc = (1.3, 0.6)):
+                          n_cols = 2, tit_sz = 15, subplt_tit_sz = 12,
+                          subplt_XYlabel_sz = 12, shareY = True,
+                          legend_loc = (0.9, 0.93), save_fig = False):
     """
     --------------------------------------------------------------------------
     Parameters
@@ -179,27 +198,36 @@ def plot_KNN_UniDist_accs(condition, TimeParams_list, fig_sz = (fig_width,12),
     out: plots
     """
     time_windows_colors = {
-        'win60_olap0' : '#2b20bd',  
+        'win60_olap0' : '#3addf2',  
         'win30_olap0' : '#0acf1b',  
         'win22_olap10' : '#b12fbd',
         'win15_olap8' : '#c9783e',
         }
+    condiciones = {
+        'cooler' : 'Estado del enfriador',
+        'valve' : 'Estado de la válvula',
+        'pump' : 'Fuga en la bomba',
+        'accumulator' : 'Estado del acumulador',
+        'stableFlag' : 'Estabilidad del sistema'
+        }  
     path = 'results/accuracies/' + condition + '/'
     condition_accs = load_condition_accuracies(path)
     N_neighbors = np.array([1, 2, 3, 4, 5, 6])
-    cols, rows = 2, np.ceil(len(TimeParams_list)/2).astype(int)
-    fig, axs = plt.subplots(rows, cols, figsize = fig_sz, dpi = 100,
+    n_rows = np.ceil(len(TimeParams_list)/n_cols).astype(int)
+    fig, axs = plt.subplots(n_rows, n_cols, figsize = fig_sz, dpi = 100,
                             sharey = shareY)
-    #fig.suptitle('Accuracies')
+    suptitle1 = 'Accuracies a partir del modelo KNN, clasifiación: '
+    suptitle2 = condiciones[condition] + '\n'+'\n'+'\n'+'\n'+'\n' +'\n'
+    fig.suptitle(suptitle1 + suptitle2, size = tit_sz)
     for TimeParam, ax in zip(TimeParams_list, fig.axes):
         curves = []
         for win_olap_str in time_windows_colors.keys():
             accs_uni = condition_accs[win_olap_str]['KNN'][TimeParam].to_numpy()
             accs_dist = condition_accs[win_olap_str]['KNNdistance'][TimeParam].to_numpy()
             #Plots
-            curv1 = ax.plot(N_neighbors, accs_uni, marker = 'o',
+            curv1 = ax.plot(N_neighbors, accs_uni, marker = 'o', mec = 'k',
                             color = time_windows_colors[win_olap_str])
-            curv2 = ax.plot(N_neighbors, accs_dist, marker = 's',
+            curv2 = ax.plot(N_neighbors, accs_dist, marker = 's', mec = 'k',
                             color = time_windows_colors[win_olap_str])
             curves = curves + [curv1 + curv2]
             #Subplot Text
@@ -214,13 +242,21 @@ def plot_KNN_UniDist_accs(condition, TimeParams_list, fig_sz = (fig_width,12),
             'Peso basado en la distancia,\n4 datos por ciclo',
             'Peso uniforme,\n7 datos por ciclo',
             'Peso basado en la distancia,\n7 datos por ciclo']    
-    fig.legend(curves, labels = lbls, bbox_to_anchor = legend_loc, ncol = 1,
+    fig.legend(curves, labels = lbls, bbox_to_anchor = legend_loc, ncol = 3,
                fancybox=True, fontsize = 'medium')
     plt.tight_layout()
+    if save_fig == True:
+        if 'Variance' in TimeParams_list:
+            path = 'images/KNN/' + condition + '_KNN_Variance'
+        else:
+            path = 'images/KNN/' + condition + '_KNN_NoVariance'
+        plt.savefig(path)
+    else:
+        pass
     plt.show()
 #%%
 def plot_SVM_accuracies(condition, TimeParams_list, fig_sz = (fig_width,8),
-                        shareY = True, subplt_tit_sz = 12,
+                        shareY = True, tit_sz = 15, subplt_tit_sz = 12,
                         subplt_XYlabel_sz  = 10, legend_loc = 'upper right'):
     """
     --------------------------------------------------------------------------
@@ -256,12 +292,22 @@ def plot_SVM_accuracies(condition, TimeParams_list, fig_sz = (fig_width,8),
     'win20_olap10',# 5 per instance
     'win18_olap10',# 6 per instance
     'win15_olap8',
-    ]  
+    ]
+    condiciones = {
+        'cooler' : 'Estado del enfriador',
+        'valve' : 'Estado de la válvula',
+        'pump' : 'Fuga en la bomba',
+        'accumulator' : 'Estado del acumulador',
+        'stableFlag' : 'Estabilidad del sistema'
+        }  
     path = 'results/accuracies/' + condition + '/'
     condition_accuracies = load_condition_accuracies(path)
     cols, rows = 2, np.ceil(len(TimeParams_list)/2).astype(int)
     fig, axs = plt.subplots(rows, cols, figsize = fig_sz, dpi = 100,
                             sharey = shareY)
+    suptitle1 = 'Accuracies a partir del modelo KNN, clasifiación: '
+    suptitle2 = condiciones[condition] + '\n'+'\n'
+    fig.suptitle(suptitle1 + suptitle2, size = tit_sz)
     # Iter over conditions
     for TimeParam, ax in zip(TimeParams_list, fig.axes):
         # Iter over trees
@@ -286,8 +332,8 @@ def plot_SVM_accuracies(condition, TimeParams_list, fig_sz = (fig_width,8),
     plt.show()
 #%%
 def plot_SVM_Heatmap(condition, Kernel, TimeParams_list, win_olap_str,
-                     Cparams_list, fig_sz = (12,10), tit_sz = 13,
-                     subplt_tit_sz = 11, subplt_XYlabel_sz = 10,
+                     Cparams_list, fig_sz = (10,8), tit_sz = 15,
+                     subplt_tit_sz = 12, subplt_XYlabel_sz = 12,
                      cbar_orient = 'horizontal'):
     """
     Plotea las accuracies obtenidas variando los parámetro 'C' y 'gamma' para
@@ -339,7 +385,6 @@ def plot_SVM_Heatmap(condition, Kernel, TimeParams_list, win_olap_str,
         'accumulator' : 'Estado del acumulador',
         'stableFlag' : 'Estabilidad del sistema'
         }    
-
     TimeParms_ES ={
         'RMS' : 'RMS',
         'P2P' : 'Valor peak to peak',
@@ -355,7 +400,7 @@ def plot_SVM_Heatmap(condition, Kernel, TimeParams_list, win_olap_str,
     tit_upper = 'Accuracies obtenidas de la clasifación: {},'.format(condicion)
     n_PerInst = get_len_PerInst(win_olap_str)
     tit_lower = '\n usando {} dato(s) por ciclo'.format(n_PerInst)
-    suptitle = tit_upper + tit_lower + ' y un kernel ' + Kernel
+    suptitle = tit_upper + tit_lower + ' y un kernel ' + Kernel+ '\n\n'
     fig.suptitle(suptitle, size = tit_sz)
     for TimeParam, ax in zip(TimeParams_list, fig.axes):
         TimeParam_df = data[['gamma', 'C', TimeParam]]
@@ -447,8 +492,8 @@ def plot_SVM_Heatmap2(condition, Kernel, TimeParams_list, win_olap_str,
         hm.set_title(TimeParms_ES[TimeParam], size = subplt_tit_sz )
 #%%
 def plot_LDA_accuracies(condition, TimeParams_list, fig_sz = (fig_width,8),
-                        shareY = True, subplt_tit_sz = 12,
-                        subplt_XYlabel_sz  = 10, legend_loc = 'upper right'):
+                        tit_sz = 15, shareY = True, subplt_tit_sz = 12,
+                        subplt_XYlabel_sz  = 12, save_fig = False):
     """
     --------------------------------------------------------------------------
     Parameters
@@ -483,12 +528,22 @@ def plot_LDA_accuracies(condition, TimeParams_list, fig_sz = (fig_width,8),
     'win20_olap10',# 5 per instance
     'win18_olap10',# 6 per instance
     'win15_olap8',
-    ]  
+    ]
+    condiciones = {
+        'cooler' : 'Estado del enfriador',
+        'valve' : 'Estado de la válvula',
+        'pump' : 'Fuga en la bomba',
+        'accumulator' : 'Estado del acumulador',
+        'stableFlag' : 'Estabilidad del sistema'
+        }    
     path = 'results/accuracies/' + condition + '/'
     condition_accuracies = load_condition_accuracies(path)
     cols, rows = 2, np.ceil(len(TimeParams_list)/2).astype(int)
     fig, axs = plt.subplots(rows, cols, figsize = fig_sz, dpi = 100,
                             sharey = shareY)
+    suptitle1 = 'Accuracies a partir del modelo KNN, clasifiación: '
+    suptitle2 = condiciones[condition] + '\n'
+    fig.suptitle(suptitle1 + suptitle2, size = tit_sz)
     # Iter over conditions
     for TimeParam, ax in zip(TimeParams_list, fig.axes):
         # Iter over trees
@@ -504,6 +559,10 @@ def plot_LDA_accuracies(condition, TimeParams_list, fig_sz = (fig_width,8),
         ax.set_xlabel('Datos por ciclo', size = subplt_XYlabel_sz)
         ax.set_ylabel('Accuracy', size = subplt_XYlabel_sz)
     plt.tight_layout()
+    if save_fig == True:
+        plt.savefig('images/LDA/' + condition + '_LDA')
+    else:
+        pass
     plt.show()
 #%%
 def get_len_training(win_olap_str, train_sz = 0.7):
